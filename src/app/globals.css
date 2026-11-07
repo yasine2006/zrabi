@@ -1,0 +1,324 @@
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 250 246 240;
+    --foreground: 42 33 27;
+    --surface: 243 236 225;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-background font-sans text-ink;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "kern" 1, "liga" 1;
+    line-height: 1.6;
+  }
+
+  ::selection {
+    @apply bg-terracotta text-background;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif text-ink;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+
+  h1 { font-size: clamp(2.5rem, 5vw, 5rem); }
+  h2 { font-size: clamp(2rem, 4vw, 3.5rem); }
+  h3 { font-size: clamp(1.5rem, 3vw, 2.25rem); }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-terracotta ring-offset-2 ring-offset-background;
+  }
+
+  input[type="range"] {
+    accent-color: #8c583a;
+  }
+
+  /* Smooth transitions globally */
+  a, button {
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Arabic typography and RTL optimization */
+  html[dir="rtl"] body {
+    font-family: "Cairo", "Plus Jakarta Sans", system-ui, sans-serif;
+  }
+
+  html[dir="rtl"] h1,
+  html[dir="rtl"] h2,
+  html[dir="rtl"] h3,
+  html[dir="rtl"] h4,
+  html[dir="rtl"] h5,
+  html[dir="rtl"] h6,
+  html[dir="rtl"] .font-serif {
+    font-family: "Cairo", Georgia, serif;
+    letter-spacing: 0;
+  }
+
+  html[dir="rtl"] .rtl-flip {
+    transform: scaleX(-1);
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-12;
+  }
+
+  .eyebrow {
+    @apply text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-terracotta;
+    letter-spacing: 0.22em;
+  }
+
+  .hairline {
+    @apply h-px w-16 bg-gold;
+  }
+
+  /* Thin editorial gold rule that fades out at the edges */
+  .rule-gold {
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(197, 155, 39, 0.55) 18%,
+      rgba(197, 155, 39, 0.55) 82%,
+      transparent
+    );
+  }
+
+  .eyebrow-line {
+    @apply inline-flex items-center gap-3 text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-terracotta;
+  }
+
+  .eyebrow-line::before {
+    content: "";
+    @apply h-px w-7 bg-gold/80;
+  }
+
+  /* Premium framed media: double border + inner glow */
+  .frame-gold {
+    position: relative;
+    border-radius: 2rem;
+    box-shadow:
+      0 1px 0 0 rgba(255, 255, 255, 0.6) inset,
+      0 40px 100px -46px rgba(42, 33, 27, 0.55);
+    outline: 1px solid rgba(197, 155, 39, 0.22);
+    outline-offset: 6px;
+  }
+
+  .card-luxe {
+    @apply relative overflow-hidden rounded-3xl border border-line/70 bg-surface/45 shadow-soft transition-all duration-500 ease-out;
+  }
+
+  .card-luxe:hover {
+    @apply -translate-y-1.5 border-terracotta/30 shadow-card;
+  }
+
+  /* Animated underline for text links */
+  .link-underline {
+    position: relative;
+  }
+
+  .link-underline::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    height: 1px;
+    width: 100%;
+    transform: scaleX(0);
+    transform-origin: right;
+    background: currentColor;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .link-underline:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  .stat-num {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.03em;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold tracking-wide transition-all duration-300 ease-out;
+  }
+
+  .btn-primary {
+    @apply btn bg-terracotta text-background shadow-soft hover:bg-terracottaDark hover:shadow-card hover:-translate-y-0.5;
+  }
+
+  .btn-ghost {
+    @apply btn border border-ink/20 bg-transparent text-ink hover:border-terracotta hover:text-terracotta hover:-translate-y-0.5;
+  }
+
+  .btn-outline {
+    @apply btn border border-line bg-background/80 text-ink backdrop-blur-sm hover:border-terracotta hover:text-terracotta hover:-translate-y-0.5;
+  }
+
+  .card {
+    @apply rounded-3xl border border-line/60 bg-surface/60 shadow-soft backdrop-blur-md transition-all duration-300 hover:shadow-card hover:-translate-y-1;
+  }
+
+  .glass {
+    @apply border border-white/50 bg-background/80 shadow-soft backdrop-blur-xl;
+  }
+
+  .field {
+    @apply h-12 w-full rounded-xl border border-line/80 bg-background/80 px-4 text-sm text-ink outline-none transition-all duration-200 placeholder:text-muted/50 focus:border-terracotta focus:bg-background focus:shadow-soft;
+  }
+
+  .field-textarea {
+    @apply field min-h-[8rem] resize-y py-3 leading-relaxed;
+  }
+
+  .field-label {
+    @apply mb-2 block text-[0.65rem] font-bold uppercase tracking-[0.18em] text-muted;
+  }
+
+  .pill {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-line/80 bg-background/90 px-3.5 py-1.5 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-ink/70 transition-all duration-200 hover:border-terracotta/50 hover:text-terracotta;
+  }
+
+  .pill-active {
+    @apply border-terracotta bg-terracotta text-background hover:bg-terracottaDark;
+  }
+
+  .status-dot {
+    @apply inline-block h-1.5 w-1.5 rounded-full bg-current;
+  }
+
+  /* Luxury card hover effect */
+  .rug-card {
+    @apply relative overflow-hidden rounded-3xl bg-surface/40 shadow-soft transition-all duration-500 ease-out hover:shadow-card hover:-translate-y-2;
+  }
+
+  /* Section divider */
+  .section-divider {
+    @apply relative py-20 sm:py-28;
+  }
+
+  /* Amazigh pattern overlay */
+  .amazigh-pattern {
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z' fill='none' stroke='%238C583A' stroke-width='0.5' opacity='0.08'/%3E%3C/svg%3E");
+    background-size: 60px 60px;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-soft {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(140, 88, 58, 0.28) transparent;
+  }
+
+  .scrollbar-soft::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-soft::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-soft::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: rgba(140, 88, 58, 0.25);
+  }
+
+  /* Luxury text gradient */
+  .text-gradient {
+    @apply bg-gradient-to-r from-terracotta to-gold bg-clip-text text-transparent;
+  }
+
+  /* Glass morphism enhanced */
+  .glass-enhanced {
+    @apply border border-white/60 bg-white/70 shadow-card backdrop-blur-2xl;
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Horizontal marquee band. Declared here (and forced with !important) so it
+   keeps scrolling smoothly on the compositor, including when the visitor's
+   system asks for reduced motion. */
+@keyframes zarbia-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* In RTL the track is aligned to the right edge, so it has to travel the other
+   way — otherwise the band empties out on one side before looping. */
+@keyframes zarbia-marquee-rtl {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(50%, 0, 0);
+  }
+}
+
+.marquee-track {
+  animation-name: zarbia-marquee !important;
+  animation-duration: 26s !important;
+  animation-timing-function: linear !important;
+  animation-iteration-count: infinite !important;
+  animation-direction: normal !important;
+  will-change: transform;
+}
+
+html[dir="rtl"] .marquee-track {
+  animation-name: zarbia-marquee-rtl !important;
+}
+

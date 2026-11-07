@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: zarbia
+      POSTGRES_PASSWORD: zarbia_pass
+      POSTGRES_DB: zarbia_atlas
+    ports:
+      - "55432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zarbia -d zarbia_atlas"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://zarbia:zarbia_pass@db:5432/zarbia_atlas
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      NEXT_PUBLIC_WHATSAPP_NUMBER: "212600000000"
+      NEXT_PUBLIC_DEFAULT_LOCALE: fr
+      NEXT_PUBLIC_SUPPORTED_LOCALES: fr,en,ar
+      ADMIN_API_KEY: replace-me-with-a-long-random-token
+      ADMIN_SESSION_SECRET: replace-me-with-a-long-random-session-secret
+      AUTH_SECRET: replace-me-with-a-32-byte-base64-secret
+      AUTH_URL: http://localhost:3000
+      AUTH_TRUST_HOST: "true"
+      TWO_FACTOR_ENCRYPTION_KEY: replace-me-with-a-32-byte-base64-key
+      SEED_ADMIN_EMAIL: admin@zarbia-atlas.ma
+      SEED_ADMIN_PASSWORD: zarbyaatlassadmin
+      SEED_ADMIN_TOTP_SECRET: JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP
+      SMTP_HOST: ""
+      ORDER_ACCESS_SECRET: replace-me-with-a-32-byte-hex-secret
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    # db push + start handled by Dockerfile CMD
+
+volumes:
+  pgdata:
