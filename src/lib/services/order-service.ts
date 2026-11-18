@@ -18,7 +18,6 @@ import {
   type CurrencyCode,
   type CurrencyRates,
 } from "@/lib/currency";
-import { getPromo } from "@/lib/promo";
 import {
   calculateShipping,
   resolveShippingZone,
@@ -125,7 +124,7 @@ async function quoteShipping(
 /**
  * Create an order and reserve every rug for 15 minutes.
  *
- * @throws {ApiError} for invalid promo codes or missing rugs.
+ * @throws {ApiError} for missing rugs.
  * @throws {RugReservationError} when a rug was sold or locked in the meantime.
  * @throws {ShippingError} when the destination cannot be shipped to.
  */
@@ -137,16 +136,6 @@ export async function createOrder(
       422,
       "PayPal payments are not available yet. Please choose another method.",
       "PAYMENT_METHOD_UNAVAILABLE",
-    );
-  }
-
-  const promo = input.promoCode ? getPromo(input.promoCode) : null;
-
-  if (input.promoCode && !promo) {
-    throw new ApiError(
-      422,
-      "This promo code is not valid.",
-      "INVALID_PROMO",
     );
   }
 
@@ -251,9 +240,7 @@ export async function createOrder(
       });
     }
 
-    const discount = promo
-      ? roundMoney((subtotal * promo.percent) / 100)
-      : 0;
+    const discount = 0;
     const totalAmount = roundMoney(subtotal - discount + shippingCost);
 
     // 4–5. Persist the order with a stable status: cash on delivery is
@@ -279,7 +266,6 @@ export async function createOrder(
         exchangeRate,
         subtotal,
         discount,
-        promoCode: promo?.code ?? null,
         shippingCost,
         totalAmount,
         customerNote: input.customerNote ?? null,

@@ -56,6 +56,44 @@ export async function POST(request: Request) {
       : "jpg";
     const filename = `${randomUUID()}.${safeExt}`;
 
+    const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
+
+    // Vercel / serverless: store in Vercel Blob when a token is configured.
+    if (blobToken) {
+      const buffer = Buffer.from(await file.arrayBuffer());
+      const response = await fetch(
+        `https://blob.vercel-storage.com/${filename}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${blobToken}`,
+            "Content-Type": file.type,
+            "x-content-type": file.type,
+          },
+          body: buffer,
+        },
+      );
+
+      if (!response.ok) {
+        const text = await response.text().catch(() => "");
+        return NextResponse.json(
+          { error: { message: `Blob upload failed: ${text || response.status}` } },
+          { status: 502 },
+        );
+      }
+
+      const data = (await response.json()) as { url?: string };
+      if (!data.url) {
+        return NextResponse.json(
+          { error: { message: "Blob upload returned no URL." } },
+          { status: 502 },
+        );
+      }
+
+      return NextResponse.json({ url: data.url });
+    }
+
+    // Local dev / Docker: store on disk.
     const uploadDir = path.join(process.cwd(), "public", "uploads");
     await mkdir(uploadDir, { recursive: true });
 

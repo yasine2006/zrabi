@@ -8,8 +8,11 @@ import {
   Filter,
   Heart,
   RotateCcw,
+  Search,
+  Sparkles,
   X,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { RugCard } from "@/components/RugCard";
@@ -78,6 +81,7 @@ export function ShopView({ rugs, initialType }: ShopViewProps) {
     return Math.max(1000, Math.ceil(highest / 500) * 500);
   }, [rugs]);
 
+  const [query, setQuery] = useState("");
   const [type, setType] = useState<RugTypeValue | "ALL">(initialType ?? "ALL");
   const [regions, setRegions] = useState<string[]>([]);
   const [availability, setAvailability] =
@@ -94,7 +98,26 @@ export function ShopView({ rugs, initialType }: ShopViewProps) {
   }, [rugs]);
 
   const filtered = useMemo(() => {
+    const needle = query.trim().toLowerCase();
     const result = rugs.filter((rug) => {
+      if (needle) {
+        const haystack = [
+          rug.nameFr,
+          rug.nameEn,
+          rug.nameAr ?? "",
+          rug.sku,
+          rug.storyFr,
+          rug.storyEn,
+          rug.materialFr,
+          rug.materialEn,
+          rug.originVillage,
+          rug.originRegion,
+        ]
+          .join(" ")
+          .toLowerCase();
+        if (!haystack.includes(needle)) return false;
+      }
+
       if (type !== "ALL" && rug.type !== type) return false;
 
       if (favoritesOnly && !favorites.includes(rug.id)) return false;
@@ -143,6 +166,7 @@ export function ShopView({ rugs, initialType }: ShopViewProps) {
     locale,
     maxPrice,
     minPrice,
+    query,
     regions,
     rugs,
     sort,
@@ -370,27 +394,38 @@ export function ShopView({ rugs, initialType }: ShopViewProps) {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <section className="relative border-b border-line/70 bg-surface/35">
-        <div className="pointer-events-none absolute inset-0 bg-zellige opacity-50" />
-        <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-gold/[0.06] blur-3xl" />
-        <div className="container-page relative py-14 sm:py-20 lg:py-24">
+      <section className="relative overflow-hidden border-b border-line/70">
+        <Image
+          src="https://images.unsplash.com/photo-1600166898405-da9535204843?auto=format&fit=crop&w=2560&q=90"
+          alt={t("Galerie des tapis marocains authentiques", "Authentic Moroccan rugs gallery", "معرض الزرابي المغربية الأصيلة")}
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/92 via-black/75 to-black/45" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-black/30" />
+        <div className="pointer-events-none absolute inset-0 bg-zellige opacity-20 mix-blend-overlay" />
+
+        <div className="container-page relative z-10 py-16 sm:py-24 lg:py-28">
           <nav
             aria-label={t("Fil d’Ariane", "Breadcrumb", "مسار التنقل")}
-            className="flex items-center gap-2 text-[0.64rem] uppercase tracking-[0.18em] text-muted"
+            className="flex items-center gap-2 text-[0.66rem] uppercase tracking-[0.2em] text-white/70"
           >
-            <Link href="/" className="transition hover:text-terracotta">
+            <Link href="/" className="transition hover:text-gold">
               {t("Accueil", "Home", "الرئيسية")}
             </Link>
             <span>/</span>
-            <span className="text-ink/65">{t("Boutique", "Shop", "المتجر")}</span>
+            <span className="text-gold font-semibold">{t("Boutique", "Shop", "المتجر")}</span>
           </nav>
 
           <div className="mt-8 grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
             <div>
-              <p className="eyebrow-line">
+              <span className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-black/40 px-3.5 py-1 text-[0.64rem] font-bold uppercase tracking-[0.22em] text-gold shadow-sm backdrop-blur-md">
+                <Sparkles className="h-3 w-3 text-gold" />
                 {t("Collection permanente", "Permanent collection", "المجموعة الدائمة")}
-              </p>
-              <h1 className="mt-4 max-w-2xl text-balance font-serif text-[2.9rem] font-semibold leading-[0.96] tracking-[-0.035em] sm:text-[4.2rem]">
+              </span>
+              <h1 className="mt-5 max-w-2xl text-balance font-serif text-[3.2rem] font-semibold leading-[0.96] tracking-[-0.035em] text-white drop-shadow-md sm:text-[4.4rem]">
                 {t(
                   "Chaque pièce est une archive.",
                   "Every piece is an archive.",
@@ -398,7 +433,7 @@ export function ShopView({ rugs, initialType }: ShopViewProps) {
                 )}
               </h1>
             </div>
-            <p className="max-w-md text-sm leading-[1.75] text-muted lg:justify-self-end">
+            <p className="max-w-md text-base leading-[1.8] text-white/85 drop-shadow-sm lg:justify-self-end">
               {t(
                 "Nous ne produisons pas de séries. Les tapis présentés ici ont été noués une seule fois, dans un village précis, par une artisane dont le nom figure sur le certificat.",
                 "We do not produce collections. The rugs shown here were knotted once, in a specific village, by an artisan whose name appears on the certificate.",
@@ -407,21 +442,21 @@ export function ShopView({ rugs, initialType }: ShopViewProps) {
             </p>
           </div>
 
-          <div className="mt-10 flex flex-wrap gap-x-10 gap-y-4 border-t border-line/80 pt-6 text-[0.62rem] uppercase tracking-[0.18em] text-muted">
+          <div className="mt-12 flex flex-wrap gap-x-12 gap-y-5 border-t border-white/20 pt-7 text-[0.66rem] uppercase tracking-[0.2em] text-white/80">
             <span>
-              <strong className="stat-num mr-2 font-serif text-2xl font-semibold text-ink">
+              <strong className="stat-num mr-2 font-serif text-3xl font-bold text-gold drop-shadow-sm">
                 {rugs.length}
               </strong>{" "}
               {t("pièces au catalogue", "pieces in the catalogue", "قطعة في الكتالوج")}
             </span>
             <span>
-              <strong className="stat-num mr-2 font-serif text-2xl font-semibold text-ink">
+              <strong className="stat-num mr-2 font-serif text-3xl font-bold text-gold drop-shadow-sm">
                 {regionOptions.length}
               </strong>{" "}
               {t("régions représentées", "regions represented", "منطقة ممثلة")}
             </span>
             <span>
-              <strong className="stat-num mr-2 font-serif text-2xl font-semibold text-ink">
+              <strong className="stat-num mr-2 font-serif text-3xl font-bold text-gold drop-shadow-sm">
                 5
               </strong>{" "}
               {t("traditions tissées", "woven traditions", "تقاليد منسوجة")}
@@ -434,6 +469,16 @@ export function ShopView({ rugs, initialType }: ShopViewProps) {
       <div className="sticky top-[5rem] z-30 border-b border-line/70 bg-background/85 backdrop-blur-lg">
         <div className="container-page flex h-14 items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted rtl:left-auto rtl:right-3" />
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={t("Rechercher un tapis…", "Search rugs…", "ابحث عن زربية…")}
+                className="h-9 w-44 rounded-full border border-line bg-background pl-9 pr-3 text-[0.7rem] text-ink outline-none transition placeholder:text-muted focus:border-terracotta sm:w-60 rtl:pl-3 rtl:pr-9"
+              />
+            </div>
             <button
               type="button"
               onClick={() => setMobileFiltersOpen(true)}

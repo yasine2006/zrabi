@@ -26,7 +26,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useStore } from "@/context/StoreContext";
 import { COUNTRY_OPTIONS } from "@/lib/i18n";
 import { roundMoney } from "@/lib/money";
-import { promoDiscount } from "@/lib/promo";
+// promo removed
 import { cn } from "@/lib/utils";
 import { getSupportWhatsAppLink } from "@/lib/whatsapp";
 
@@ -106,9 +106,6 @@ export function CheckoutView() {
     t,
     locale,
     currency,
-    promo,
-    applyPromo,
-    removePromo,
   } = useStore();
 
   const [mode, setMode] = useState<Mode>("guest");
@@ -123,11 +120,6 @@ export function CheckoutView() {
   const [availablePayments, setAvailablePayments] = useState<PaymentChoice[]>([
     "COD",
   ]);
-  const [promoInput, setPromoInput] = useState("");
-  const [promoMessage, setPromoMessage] = useState<{
-    ok: boolean;
-    text: string;
-  } | null>(null);
   const [profileMessage, setProfileMessage] = useState<string | null>(null);
 
   const cartKey = cart.map((item) => item.id).join(",");
@@ -148,7 +140,7 @@ export function CheckoutView() {
     [cart, currency],
   );
 
-  const discount = promo ? promoDiscount(subtotal, promo.code) : 0;
+  const discount = 0;
   const shipping = quote
     ? currency === "MAD"
       ? quote.priceMad
@@ -420,7 +412,6 @@ export function CheckoutView() {
         items: cart.map((item) => ({ rugId: item.id, quantity: 1 })),
         paymentMethod: payment,
         currency,
-        promoCode: promo?.code,
         customerNote: form.note.trim() || undefined,
       });
 
@@ -456,12 +447,7 @@ export function CheckoutView() {
     }
   }
 
-  function handleApplyPromo() {
-    if (!promoInput.trim()) return;
-    const result = applyPromo(promoInput);
-    setPromoMessage({ ok: result.ok, text: result.message });
-    if (result.ok) setPromoInput("");
-  }
+  // promo removed
 
   const isMorocco = form.country === "MA";
   const canPayByCard =
@@ -1185,68 +1171,12 @@ export function CheckoutView() {
               </div>
 
               <div className="border-t border-line/70 px-5 py-4">
-                <div className="flex gap-2">
-                  <input
-                    value={promoInput}
-                    onChange={(event) => setPromoInput(event.target.value)}
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter") {
-                        event.preventDefault();
-                        handleApplyPromo();
-                      }
-                    }}
-                    placeholder={t("Code promo", "Promo code")}
-                    className="h-9 min-w-0 flex-1 rounded-xl border border-line bg-background px-3 text-[0.7rem] uppercase tracking-[0.06em] outline-none focus:border-terracotta"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleApplyPromo}
-                    className="h-9 rounded-xl bg-ink px-3.5 text-[0.64rem] font-semibold text-background transition hover:bg-terracotta"
-                  >
-                    {t("Appliquer", "Apply")}
-                  </button>
-                </div>
-
-                {promo ? (
-                  <div className="mt-2 flex items-center justify-between gap-2 rounded-lg bg-emerald-50 px-3 py-2 text-[0.68rem] text-emerald-800">
-                    <span className="flex items-center gap-1.5 font-semibold">
-                      <Check className="h-3.5 w-3.5" />
-                      {promo.code} · −{promo.percent}%
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        removePromo();
-                        setPromoMessage(null);
-                      }}
-                      className="grid h-5 w-5 place-items-center rounded-full hover:bg-emerald-100"
-                      aria-label={t("Retirer le code", "Remove code")}
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                ) : promoMessage ? (
-                  <p
-                    className={cn(
-                      "mt-2 text-[0.66rem]",
-                      promoMessage.ok ? "text-emerald-700" : "text-red-600",
-                    )}
-                  >
-                    {promoMessage.text}
-                  </p>
-                ) : null}
-
                 <dl className="mt-4 space-y-2 text-[0.75rem]">
                   <div className="flex justify-between text-muted">
                     <dt>{t("Sous-total", "Subtotal")}</dt>
                     <dd>{format(subtotal)}</dd>
                   </div>
-                  {discount > 0 ? (
-                    <div className="flex justify-between text-emerald-700">
-                      <dt>{t("Remise", "Discount")}</dt>
-                      <dd>−{format(discount)}</dd>
-                    </div>
-                  ) : null}
+                  {/* discount removed */}
                   <div className="flex justify-between text-muted">
                     <dt className="flex items-center gap-1.5">
                       <Truck className="h-3.5 w-3.5 text-terracotta" />

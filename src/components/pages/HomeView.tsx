@@ -29,6 +29,10 @@ interface HomeViewProps {
   artisan: StorefrontArtisan | null;
 }
 
+/** Fixed hero background image. Replace this URL to change the hero photo. */
+const HERO_IMAGE =
+  "https://tse1.mm.bing.net/th/id/OIP.IP8GU4v2gSfr8zP7R9JCuQHaE6?r=0&rs=1&pid=ImgDetMain&o=7&rm=3";
+
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
   visible: { opacity: 1, y: 0 },
@@ -166,71 +170,68 @@ export function HomeView({ rugs, artisan }: HomeViewProps) {
   return (
     <div className="overflow-hidden">
       {/* ---------------------------------------------------------------- hero */}
-      <section className="relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 bg-zellige opacity-[0.6]" />
-        <div className="pointer-events-none absolute -left-40 top-[-10rem] h-[26rem] w-[26rem] rounded-full bg-gold/[0.07] blur-3xl" />
-        <div className="pointer-events-none absolute -right-32 bottom-[-12rem] h-[30rem] w-[30rem] rounded-full bg-terracotta/[0.06] blur-3xl" />
-        <div className="container-page relative grid gap-14 pb-20 pt-14 sm:pb-24 lg:grid-cols-[1.02fr_0.98fr] lg:items-center lg:gap-16 lg:pb-28 lg:pt-20">
+      <section className="relative min-h-[90vh] flex items-center overflow-hidden">
+        <Image
+          src={HERO_IMAGE}
+          alt={t("Tapis marocain artisanal dans un intérieur de luxe", "Artisanal Moroccan rug in a luxury interior", "زربية مغربية تقليدية في ديكور أصيل وفاخر")}
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center scale-105 transition-transform duration-1000 ease-out"
+        />
+        {/* Cinematic rich overlays for ultra-sharp text contrast */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/90 via-black/65 to-black/35" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-black/40" />
+        <div className="pointer-events-none absolute inset-0 bg-zellige opacity-20 mix-blend-overlay" />
+
+        <div className="container-page relative z-10 py-20 sm:py-28 lg:py-32">
           <motion.div
+            className="mx-auto max-w-3xl text-center"
             initial={reduceMotion ? false : "hidden"}
             animate="visible"
             variants={{
               hidden: {},
               visible: { transition: { staggerChildren: 0.1 } },
             }}
-            className="relative z-10"
           >
             <motion.div
               variants={fadeUp}
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              className="flex items-center gap-3"
+              className="flex items-center justify-center gap-3"
             >
-              <span className="hairline w-10" />
-              <p className="text-[0.62rem] font-semibold uppercase tracking-[0.28em] text-terracotta">
+              <span className="inline-flex items-center gap-2 rounded-full border border-gold/50 bg-black/50 px-4 py-1.5 text-[0.66rem] font-bold uppercase tracking-[0.24em] text-gold shadow-lg backdrop-blur-md">
+                <Sparkles className="h-3.5 w-3.5 text-gold animate-pulse" />
                 {t(
-                  "Maison de tapis · Maroc",
-                  "House of rugs · Morocco",
-                  "دار الزرابي · المغرب",
+                  "Pièces Uniques & Certifiées · Atlas Maroc",
+                  "Unique & Certified Pieces · Atlas Morocco",
+                  "قطع فريدة ومعتمدة · أطلس المغرب",
                 )}
-              </p>
+              </span>
             </motion.div>
-
-            <motion.p
-              variants={fadeUp}
-              transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-6 flex items-center gap-2 text-[0.68rem] font-medium uppercase tracking-[0.2em] text-muted"
-            >
-              <Sparkles className="h-3.5 w-3.5 text-gold" />
-              {t(
-                "Tapis marocains authentiques, faits main et livrés dans le monde entier",
-                "Authentic Moroccan Rugs, Handmade and Shipped Worldwide",
-                "زرابي مغربية أصيلة، منسوجة يدوياً وتشحن إلى جميع أنحاء العالم",
-              )}
-            </motion.p>
 
             <motion.h1
               variants={fadeUp}
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-5 max-w-2xl text-balance font-serif text-[3.5rem] font-semibold leading-[0.92] tracking-[-0.04em] text-ink sm:text-[4.8rem] lg:text-[5.6rem]"
+              className="mt-6 font-serif text-[3.4rem] font-semibold leading-[0.95] tracking-[-0.035em] text-white drop-shadow-md sm:text-[4.8rem] lg:text-[5.8rem]"
             >
               {locale === "ar" ? (
                 <>
-                  روح الأطلس،
-                  <span className="block italic text-terracotta">
-                    منسوجة يدوياً.
+                  أصالة الأطلس،
+                  <span className="block font-serif italic text-gold">
+                    منسوجة بأنامل ذهبية.
                   </span>
                 </>
               ) : locale === "en" ? (
                 <>
                   The soul of the Atlas,
-                  <span className="block italic text-terracotta">
+                  <span className="block font-serif italic text-gold">
                     knotted by hand.
                   </span>
                 </>
               ) : (
                 <>
                   L’âme de l’Atlas,
-                  <span className="block italic text-terracotta">
+                  <span className="block font-serif italic text-gold">
                     nouée à la main.
                   </span>
                 </>
@@ -238,18 +239,18 @@ export function HomeView({ rugs, artisan }: HomeViewProps) {
             </motion.h1>
 
             <motion.div
-              initial={{ opacity: 0, y: 24 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-4 flex items-center gap-3"
+              className="mt-4 flex items-center justify-center gap-3"
             >
-              <span className="hairline w-8" />
+              <span className="h-px w-10 bg-gold/70" />
               <motion.span
                 key={rotatingIndex}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                className="font-serif text-lg italic text-terracotta"
+                className="font-serif text-xl italic text-gold drop-shadow-sm"
               >
                 {marquee[rotatingIndex]}
               </motion.span>
@@ -258,26 +259,32 @@ export function HomeView({ rugs, artisan }: HomeViewProps) {
             <motion.p
               variants={fadeUp}
               transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-7 max-w-xl text-pretty text-[1rem] leading-[1.75] text-muted sm:text-[1.08rem]"
+              className="mt-6 max-w-2xl text-pretty text-base font-normal leading-[1.8] text-white/90 drop-shadow-sm sm:text-lg"
             >
               {t(
-                "Des tapis berbères choisis un par un dans les villages du Moyen et du Haut Atlas. Laine vivante, couleurs de terre, gestes transmis de mère en fille — et livrés chez vous, partout dans le monde.",
-                "Berber rugs selected one by one in the villages of the Middle and High Atlas. Living wool, earth-born colour and gestures passed from mother to daughter — delivered to your door, anywhere in the world.",
-                "زرابي أمازيغية مختارة واحدة تلو الأخرى من قرى الأطلس المتوسط والكبير. صوف حيّ، ألوان أرضية، وحركات تُورث من أم إلى ابنة — وتُسلَّم إلى بابك، أينما كنت في العالم.",
+                "Des tapis berbères d'exception choisis un à un dans les villages du Moyen et du Haut Atlas. Laine vierge naturelle, teintures végétales et savoir-faire ancestral transmis de mère en fille — expédiés avec certificat d'origine chez vous, partout dans le monde.",
+                "Exceptional Berber rugs selected one by one in the villages of the Middle and High Atlas. Natural virgin wool, plant-based dyes and ancestral craft passed down through generations — shipped with certificate of origin to your door worldwide.",
+                "زرابي أمازيغية استثنائية منتقاة بعناية فائقة من قرى الأطلس المتوسط والكبير. صوف طبيعي حر، أصباغ نباتية، وحرفة متوارثة عبر الأجيال — تُشحن مع شهادة الأصالة إلى باب منزلك في جميع أنحاء العالم.",
               )}
             </motion.p>
 
             <motion.div
               variants={fadeUp}
               transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center"
+              className="mt-8 flex flex-col items-center gap-3.5 sm:flex-row sm:justify-center sm:items-center"
             >
-              <Link href="/shop" className="btn-primary group px-8 py-4">
+              <Link
+                href="/shop"
+                className="btn bg-terracotta px-8 py-4 text-sm font-bold text-white shadow-lift transition hover:bg-terracottaDark hover:scale-[1.02] group"
+              >
                 {t("Découvrir la collection", "Explore the collection", "تصفح المجموعة الفريدة")}
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1 rtl-flip" />
               </Link>
-              <Link href="/custom-order" className="btn-ghost group px-8 py-4">
-                {t("Composer mon tapis", "Design my rug", "صمم زربيتك")}
+              <Link
+                href="/custom-order"
+                className="btn border border-white/40 bg-white/10 px-8 py-4 text-sm font-bold text-white backdrop-blur-md shadow-soft transition hover:bg-white hover:text-ink hover:scale-[1.02] group"
+              >
+                {t("Composer mon tapis", "Design my rug", "صمم زربيتك الخاصة")}
                 <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 rtl-flip" />
               </Link>
             </motion.div>
@@ -285,120 +292,24 @@ export function HomeView({ rugs, artisan }: HomeViewProps) {
             <motion.div
               variants={fadeUp}
               transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-11 flex flex-wrap gap-x-10 gap-y-5 border-t border-line/80 pt-6"
+              className="mt-12 flex flex-wrap items-center justify-center gap-x-10 gap-y-5 border-t border-white/20 pt-7"
             >
               {[
                 [String(rugs.length), t("pièces uniques", "unique pieces", "قطع فريدة")],
                 ["3", t("villages partenaires", "partner villages", "قرى شريكة")],
                 ["5", t("traditions tissées", "woven traditions", "تقاليد منسوجة")],
+                ["100%", t("fait main au Maroc", "handmade in Morocco", "منسوج يدوياً بالمغرب")],
               ].map(([value, label]) => (
                 <div key={label}>
-                  <p className="stat-num font-serif text-[2rem] font-semibold leading-none">
+                  <p className="font-serif text-3xl font-bold leading-none text-gold drop-shadow-sm">
                     {value}
                   </p>
-                  <p className="mt-1.5 text-[0.62rem] uppercase tracking-[0.2em] text-muted">
+                  <p className="mt-1.5 text-[0.65rem] font-medium uppercase tracking-[0.2em] text-white/80">
                     {label}
                   </p>
                 </div>
               ))}
             </motion.div>
-          </motion.div>
-
-          <motion.div
-            initial={reduceMotion ? false : { opacity: 0, scale: 0.96, y: 24 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-            className="relative mx-auto w-full max-w-[34rem] lg:max-w-none"
-          >
-            <div className="frame-gold relative aspect-[4/5] overflow-hidden bg-wool sm:aspect-[5/6]">
-              {heroRug?.photos[0] ? (
-                <Image
-                  src={heroRug.photos[0]}
-                  alt={
-                    locale === "ar"
-                      ? heroRug.nameFr
-                      : locale === "en"
-                        ? heroRug.nameEn
-                        : heroRug.nameFr
-                  }
-                  fill
-                  priority
-                  sizes="(min-width: 1024px) 46vw, 92vw"
-                  className="object-cover"
-                />
-              ) : null}
-              <div className="absolute inset-0 bg-gradient-to-t from-ink/55 via-ink/5 to-transparent" />
-
-              <div className="absolute inset-x-5 bottom-5 flex items-end justify-between gap-3 rounded-2xl border border-white/20 bg-white/10 p-4 text-background backdrop-blur-xl sm:inset-x-6 sm:bottom-6">
-                <div>
-                  <p className="text-[0.56rem] font-bold uppercase tracking-[0.22em] text-background/75">
-                    {t("Pièce du moment", "Piece of the moment", "قطعة اللحظة")}
-                  </p>
-                  <p className="mt-1.5 font-serif text-[1.7rem] font-semibold leading-none">
-                    {heroRug
-                      ? locale === "ar"
-                        ? (heroRug.nameAr ?? heroRug.nameFr)
-                        : locale === "en"
-                          ? heroRug.nameEn
-                          : heroRug.nameFr
-                      : "Atlas Neige"}
-                  </p>
-                  <p className="mt-1.5 text-[0.68rem] text-background/75">
-                    {heroRug
-                      ? `${heroRug.widthCm} × ${heroRug.lengthCm} cm · ${heroRug.originVillage}`
-                      : ""}
-                  </p>
-                </div>
-                <Link
-                  href={heroRug ? `/rugs/${heroRug.slug}` : "/shop"}
-                  className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-background text-ink transition hover:bg-gold hover:text-ink"
-                  aria-label={t("Voir la pièce", "View piece")}
-                >
-                  <ArrowUpRight className="h-4 w-4" />
-                </Link>
-              </div>
-            </div>
-
-            {heroSecondary?.photos[0] ? (
-              <motion.div
-                initial={reduceMotion ? false : { opacity: 0, x: 20, y: 20 }}
-                animate={{ opacity: 1, x: 0, y: 0 }}
-                transition={{ delay: 0.45, duration: 0.75 }}
-                className="absolute -bottom-7 -left-3 hidden w-36 overflow-hidden rounded-2xl border-4 border-background shadow-card sm:block lg:-left-8 lg:w-44"
-              >
-                <div className="relative aspect-square">
-                  <Image
-                    src={heroSecondary.photos[0]}
-                    alt=""
-                    fill
-                    sizes="176px"
-                    className="object-cover"
-                  />
-                </div>
-                <div className="bg-background px-3 py-2">
-                  <p className="text-[0.56rem] font-bold uppercase tracking-[0.18em] text-terracotta">
-                    {t("Nouveau", "New arrival", "جديد")}
-                  </p>
-                  <p className="mt-0.5 truncate font-serif text-sm font-semibold">
-                    {locale === "ar"
-                      ? (heroSecondary.nameAr ?? heroSecondary.nameFr)
-                      : locale === "en"
-                        ? heroSecondary.nameEn
-                        : heroSecondary.nameFr}
-                  </p>
-                </div>
-              </motion.div>
-            ) : null}
-
-            <div className="absolute -right-3 top-6 hidden rotate-3 rounded-2xl border border-gold/30 bg-background/95 px-4 py-3 shadow-soft backdrop-blur sm:block lg:-right-6">
-              <p className="text-[0.54rem] font-bold uppercase tracking-[0.2em] text-muted">
-                {t("Certifié", "Certified", "معتمد")}
-              </p>
-              <p className="mt-1 flex items-center gap-1.5 text-xs font-semibold">
-                <BadgeCheck className="h-4 w-4 text-gold" />
-                {t("Origine Atlas", "Atlas origin", "أصل الأطلس")}
-              </p>
-            </div>
           </motion.div>
         </div>
       </section>

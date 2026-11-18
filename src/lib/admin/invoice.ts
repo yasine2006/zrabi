@@ -356,7 +356,7 @@ export async function buildInvoicePdf(
 
   if (Number(order.discount) > 0) {
     totalRows.push([
-      `Remise${order.promoCode ? ` (${order.promoCode})` : ""}`,
+      `Remise`,
       `-${amount(Number(order.discount), currency)}`,
       false,
     ]);

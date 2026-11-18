@@ -44,7 +44,6 @@ export async function getOrderById(id: string) {
       currency: order.currency,
       subtotal: Number(order.subtotal),
       discount: Number(order.discount),
-      promoCode: order.promoCode,
       shippingCost: Number(order.shippingCost),
       totalAmount: Number(order.totalAmount),
       trackingNumber: order.trackingNumber,

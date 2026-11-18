@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, FileText, Scale } from "lucide-react";
 import { useStore } from "@/context/StoreContext";
 import {
@@ -30,37 +31,51 @@ export function LegalView({ document }: { document: LegalDocument }) {
   const updated = formatUpdated(locale);
 
   return (
-    <article className="container-page py-14 sm:py-20 lg:py-24">
-      <nav
-        aria-label={t("Fil d’Ariane", "Breadcrumb", "مسار التنقل")}
-        className="flex items-center gap-2 text-[0.66rem] uppercase tracking-[0.16em] text-muted"
-      >
-        <Link href="/" className="transition hover:text-terracotta">
-          {t("Accueil", "Home", "الرئيسية")}
-        </Link>
-        <span aria-hidden>·</span>
-        <span className="text-ink/70">{document.title[locale]}</span>
-      </nav>
+    <article className="min-h-screen">
+      {/* Header Hero */}
+      <section className="relative overflow-hidden border-b border-line/70 bg-ink text-white">
+        <Image
+          src="https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=2000&q=85"
+          alt="Mentions légales Zarbia Atlas"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/92 via-black/75 to-black/45" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/40" />
+        <div className="container-page relative z-10 py-16 sm:py-24">
+          <nav
+            aria-label={t("Fil d’Ariane", "Breadcrumb", "مسار التنقل")}
+            className="flex items-center gap-2 text-[0.66rem] uppercase tracking-[0.2em] text-white/60"
+          >
+            <Link href="/" className="transition hover:text-gold">
+              {t("Accueil", "Home", "الرئيسية")}
+            </Link>
+            <span aria-hidden>·</span>
+            <span className="text-gold">{document.title[locale]}</span>
+          </nav>
 
-      <header className="mt-8 max-w-3xl">
-        <span className="grid h-12 w-12 place-items-center rounded-full bg-surface text-terracotta">
-          <Scale className="h-5 w-5" />
-        </span>
-        <p className="eyebrow mt-5">
-          {t("Informations légales", "Legal information", "معلومات قانونية")}
-        </p>
-        <h1 className="mt-2 text-balance font-serif text-4xl font-semibold leading-[1.03] sm:text-5xl">
-          {document.title[locale]}
-        </h1>
-        <p className="mt-4 text-base leading-relaxed text-muted sm:text-lg">
-          {document.intro[locale]}
-        </p>
-        <p className="mt-4 text-[0.68rem] uppercase tracking-[0.14em] text-muted">
-          {t("Dernière mise à jour", "Last updated", "آخر تحديث")} · {updated}
-        </p>
-      </header>
+          <header className="mt-8 max-w-3xl">
+            <span className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-3.5 py-1 text-[0.7rem] font-medium tracking-[0.2em] text-gold uppercase">
+              <span className="h-1.5 w-1.5 rounded-full bg-gold" />
+              {t("Informations légales", "Legal information", "معلومات قانونية")}
+            </span>
+            <h1 className="mt-5 text-balance font-serif text-4xl font-semibold leading-[1.05] text-white sm:text-5xl lg:text-6xl">
+              {document.title[locale]}
+            </h1>
+            <p className="mt-4 text-base leading-relaxed text-white/80 sm:text-lg">
+              {document.intro[locale]}
+            </p>
+            <p className="mt-4 text-[0.7rem] uppercase tracking-[0.16em] text-white/60">
+              {t("Dernière mise à jour", "Last updated", "آخر تحديث")} · {updated}
+            </p>
+          </header>
+        </div>
+      </section>
 
-      <div className="mt-12 grid gap-10 lg:grid-cols-[16rem_1fr] lg:gap-16">
+      <div className="container-page py-12 sm:py-16">
+        <div className="grid gap-10 lg:grid-cols-[16rem_1fr] lg:gap-16">
         <aside className="lg:sticky lg:top-28 lg:self-start">
           <p className="flex items-center gap-2 text-[0.64rem] font-bold uppercase tracking-[0.2em] text-ink/60">
             <FileText className="h-3.5 w-3.5 text-terracotta" />
@@ -147,6 +162,7 @@ export function LegalView({ document }: { document: LegalDocument }) {
           </div>
         </div>
       </div>
-    </article>
+    </div>
+  </article>
   );
 }

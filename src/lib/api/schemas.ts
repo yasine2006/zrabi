@@ -176,12 +176,6 @@ export const orderCreateSchema = z.object({
     .max(20),
   paymentMethod: z.nativeEnum(PaymentMethod).default(PaymentMethod.COD),
   currency: z.nativeEnum(Currency).default(Currency.MAD),
-  promoCode: z
-    .string()
-    .trim()
-    .toUpperCase()
-    .max(40)
-    .optional(),
   customerNote: z.string().trim().max(2000).optional(),
 });
 

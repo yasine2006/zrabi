@@ -4,6 +4,7 @@ import { useEffect, useState, useTransition } from "react";
 import {
   Boxes,
   ClipboardList,
+  FileText,
   Globe2,
   LayoutDashboard,
   LogOut,
@@ -26,8 +27,9 @@ import { RugsTab } from "./RugsTab";
 import { OrdersTab } from "./OrdersTab";
 import { CustomOrdersTab } from "./CustomOrdersTab";
 import { SettingsTab } from "./SettingsTab";
+import { BlogTab } from "./BlogTab";
 
-type TabId = "overview" | "rugs" | "orders" | "custom" | "settings";
+type TabId = "overview" | "rugs" | "orders" | "custom" | "blog" | "settings";
 
 interface AdminDashboardProps {
   session: AdminSessionView;
@@ -108,6 +110,12 @@ export function AdminDashboard({ session, data }: AdminDashboardProps) {
           (order) =>
             order.status !== "COMPLETED" && order.status !== "CANCELLED",
         ).length || undefined,
+    },
+    {
+      id: "blog",
+      label: t("Journal", "Journal", "المدونة"),
+      icon: FileText,
+      badge: data.blogPosts.length || undefined,
     },
     {
       id: "settings",
@@ -246,6 +254,14 @@ export function AdminDashboard({ session, data }: AdminDashboardProps) {
         {tab === "custom" ? (
           <CustomOrdersTab
             customOrders={data.customOrders}
+            canWrite={canWrite}
+            onMutated={onMutated}
+          />
+        ) : null}
+
+        {tab === "blog" ? (
+          <BlogTab
+            posts={data.blogPosts}
             canWrite={canWrite}
             onMutated={onMutated}
           />

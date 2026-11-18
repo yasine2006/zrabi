@@ -336,9 +336,6 @@ export function OrdersTab({ orders, canWrite, onMutated }: OrdersTabProps) {
                             <div className="flex justify-between text-muted">
                               <span>
                                 {t("Remise", "Discount", "خصم")}
-                                {order.promoCode
-                                  ? ` (${order.promoCode})`
-                                  : ""}
                               </span>
                               <span>
                                 −{formatMoney(order.discount, order.currency)}

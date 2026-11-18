@@ -209,7 +209,6 @@ model Order {
   exchangeRate      Decimal       @db.Decimal(12, 6) @default(1) // selected currency -> MAD
   subtotal          Decimal       @db.Decimal(12, 2)
   discount          Decimal       @default(0) @db.Decimal(12, 2)
-  promoCode         String?
   shippingCost      Decimal       @db.Decimal(12, 2) @default(0)
   totalAmount       Decimal       @db.Decimal(12, 2)
   trackingNumber    String?
@@ -348,6 +347,35 @@ model Review {
   @@unique([rugId, userId])
   @@index([rugId, isPublished])
   @@map("reviews")
+}
+
+// ---------------------------------------------------------------------------
+// Blog
+// ---------------------------------------------------------------------------
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  titleFr     String
+  titleEn     String
+  titleAr     String?
+  excerptFr   String   @db.Text
+  excerptEn   String   @db.Text
+  excerptAr   String?  @db.Text
+  contentFr   String   @db.Text
+  contentEn   String   @db.Text
+  contentAr   String?  @db.Text
+  category    String   @default("guide")
+  coverImage  String
+  readingMinutes Int   @default(5)
+  publishedAt DateTime @default(now())
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isPublished, publishedAt])
+  @@index([slug])
+  @@map("blog_posts")
 }
 
 // ---------------------------------------------------------------------------

@@ -10,6 +10,9 @@
 # Next.js
 /.next/
 /out/
+
+# Uploaded images (local dev)
+/public/uploads/
 next-env.d.ts
 
 # Production
@@ -32,3 +35,6 @@ yarn-debug.log*
 yarn-error.log*
 .vercel
 *.tsbuildinfo
+
+.vercel
+.env*

@@ -238,6 +238,7 @@ export function ProductView({ rug, related }: ProductViewProps) {
                   src={src}
                   alt=""
                   fill
+                  unoptimized
                   sizes="80px"
                   className="object-cover"
                 />
@@ -266,6 +267,7 @@ export function ProductView({ rug, related }: ProductViewProps) {
                   }
                   fill
                   priority
+                  unoptimized
                   sizes="(min-width: 1024px) 52vw, 100vw"
                   className="object-cover transition duration-500"
                 />

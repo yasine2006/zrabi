@@ -83,7 +83,6 @@ export interface AdminOrder {
   exchangeRate: number;
   subtotal: number;
   discount: number;
-  promoCode: string | null;
   shippingCost: number;
   totalAmount: number;
   trackingNumber: string | null;
@@ -170,6 +169,7 @@ export interface AdminDashboardData {
   shippingRates: AdminShippingRate[];
   currencyRates: AdminCurrencyRate[];
   artisans: AdminArtisanOption[];
+  blogPosts: any[];
 }
 
 export interface NotificationChannelResult {

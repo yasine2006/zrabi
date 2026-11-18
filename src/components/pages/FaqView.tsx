@@ -13,6 +13,7 @@ import {
   X,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import { useStore } from "@/context/StoreContext";
 import { getSupportWhatsAppLink } from "@/lib/whatsapp";
@@ -284,28 +285,37 @@ export function FaqView() {
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
-      <section className="relative overflow-hidden border-b border-line/70 bg-surface/35">
-        <div className="pointer-events-none absolute inset-0 bg-zellige opacity-50" />
-        <div className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-gold/[0.06] blur-3xl" />
-        <div className="container-page relative py-14 sm:py-20">
+      {/* Header Hero */}
+      <section className="relative overflow-hidden border-b border-line/70 bg-ink text-white">
+        <Image
+          src="https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=2000&q=85"
+          alt="Palais et architecture marocaine"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/92 via-black/75 to-black/45" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/40" />
+        <div className="container-page relative z-10 py-16 sm:py-24">
           <nav
             aria-label={t("Fil d’Ariane", "Breadcrumb", "مسار التنقل")}
-            className="flex items-center gap-2 text-[0.64rem] uppercase tracking-[0.18em] text-muted"
+            className="flex items-center gap-2 text-[0.66rem] uppercase tracking-[0.2em] text-white/60"
           >
-            <Link href="/" className="transition hover:text-terracotta">
+            <Link href="/" className="transition hover:text-gold">
               {t("Accueil", "Home", "الرئيسية")}
             </Link>
             <span>/</span>
-            <span className="text-ink/65">FAQ</span>
+            <span className="text-gold">FAQ</span>
           </nav>
 
-          <div className="mt-8 grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
+          <div className="mt-8 grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
             <div>
-              <p className="eyebrow-line">
+              <span className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-3.5 py-1 text-[0.7rem] font-medium tracking-[0.2em] text-gold uppercase">
+                <span className="h-1.5 w-1.5 rounded-full bg-gold" />
                 {t("Questions fréquentes", "Frequently asked", "الأسئلة الشائعة")}
-              </p>
-              <h1 className="mt-4 max-w-2xl text-balance font-serif text-[2.9rem] font-semibold leading-[0.96] tracking-[-0.035em] sm:text-[4.2rem]">
+              </span>
+              <h1 className="mt-5 max-w-2xl text-balance font-serif text-[2.9rem] font-semibold leading-[1.02] tracking-[-0.035em] text-white sm:text-[4.2rem]">
                 {t(
                   "Tout ce qu’on nous demande avant de choisir.",
                   "Everything people ask before choosing.",
@@ -313,7 +323,7 @@ export function FaqView() {
                 )}
               </h1>
             </div>
-            <p className="max-w-md text-sm leading-[1.75] text-muted lg:justify-self-end">
+            <p className="max-w-md text-sm leading-[1.8] text-white/80 lg:justify-self-end">
               {t(
                 "Livraison, authenticité, entretien, paiement et sur-mesure. Si votre question n’est pas ici, écrivez-nous : nous répondons en moins d’un jour ouvré.",
                 "Shipping, authenticity, care, payment and bespoke. If your question is not here, message us: we reply within one business day.",

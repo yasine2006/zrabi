@@ -657,6 +657,63 @@ export const BLOG_POSTS: readonly BlogPost[] = [
   },
 ];
 
+export interface NormalizedBlogPost {
+  slug: string;
+  titleFr: string;
+  titleEn: string;
+  titleAr: string;
+  excerptFr: string;
+  excerptEn: string;
+  excerptAr: string;
+  coverImage: string;
+  readingMinutes: number;
+  publishedAt: string;
+  categoryFr: string;
+  categoryEn: string;
+  categoryAr: string;
+}
+
+export function normalizeBlogPost(post: any): NormalizedBlogPost {
+  // DB shape
+  if (post && typeof post.titleFr === "string") {
+    return {
+      slug: post.slug,
+      titleFr: post.titleFr,
+      titleEn: post.titleEn ?? post.titleFr,
+      titleAr: post.titleAr ?? post.titleFr,
+      excerptFr: post.excerptFr,
+      excerptEn: post.excerptEn ?? post.excerptFr,
+      excerptAr: post.excerptAr ?? post.excerptFr,
+      coverImage: post.coverImage,
+      readingMinutes: post.readingMinutes ?? 5,
+      publishedAt: post.publishedAt ?? new Date().toISOString(),
+      categoryFr: post.category ?? "guide",
+      categoryEn: post.category ?? "guide",
+      categoryAr: post.category ?? "guide",
+    };
+  }
+  // Hardcoded shape
+  return {
+    slug: post.slug,
+    titleFr: blogTitle(post, "fr"),
+    titleEn: blogTitle(post, "en"),
+    titleAr: blogTitle(post, "ar"),
+    excerptFr: blogExcerpt(post, "fr"),
+    excerptEn: blogExcerpt(post, "en"),
+    excerptAr: blogExcerpt(post, "ar"),
+    coverImage: post.coverImage,
+    readingMinutes: post.readingMinutes,
+    publishedAt: post.publishedAt,
+    categoryFr: blogCategory(post, "fr"),
+    categoryEn: blogCategory(post, "en"),
+    categoryAr: blogCategory(post, "ar"),
+  };
+}
+
+export function normalizeBlogPosts(posts: any[]): NormalizedBlogPost[] {
+  return posts.map(normalizeBlogPost);
+}
+
 export function getBlogPost(slug: string): BlogPost | null {
   return BLOG_POSTS.find((post) => post.slug === slug) ?? null;
 }

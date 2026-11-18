@@ -19,6 +19,7 @@ import {
   UserRound,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { useMemo, useState, type FormEvent } from "react";
 import { useStore } from "@/context/StoreContext";
 import {
@@ -137,6 +138,7 @@ export function CustomOrderView() {
   const [colours, setColours] = useState<string[]>(["ecru", "argile"]);
   const [pattern, setPattern] = useState<string>("diamonds");
   const [brief, setBrief] = useState("");
+  const [inspirationUrls, setInspirationUrls] = useState("");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -259,6 +261,10 @@ export function CustomOrderView() {
           description: composedDescription,
           budgetMad,
           currency,
+          inspirationPhotos: inspirationUrls
+            .split(/[\n,]+/)
+            .map((s) => s.trim())
+            .filter((s) => /^https?:\/\//i.test(s)),
         }),
       });
 
@@ -394,28 +400,37 @@ export function CustomOrderView() {
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
-      <section className="relative overflow-hidden border-b border-line/70 bg-surface/35">
-        <div className="pointer-events-none absolute inset-0 bg-zellige opacity-50" />
-        <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-gold/[0.06] blur-3xl" />
-        <div className="container-page relative py-14 sm:py-20">
+      {/* Header Hero */}
+      <section className="relative overflow-hidden border-b border-line/70 bg-ink text-white">
+        <Image
+          src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=2000&q=85"
+          alt="Tapis sur mesure dans un salon contemporain"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/92 via-black/75 to-black/45" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/40" />
+        <div className="container-page relative z-10 py-16 sm:py-24">
           <nav
             aria-label={t("Fil d’Ariane", "Breadcrumb", "مسار التنقل")}
-            className="flex items-center gap-2 text-[0.64rem] uppercase tracking-[0.18em] text-muted"
+            className="flex items-center gap-2 text-[0.66rem] uppercase tracking-[0.2em] text-white/60"
           >
-            <Link href="/" className="transition hover:text-terracotta">
+            <Link href="/" className="transition hover:text-gold">
               {t("Accueil", "Home", "الرئيسية")}
             </Link>
             <span>/</span>
-            <span className="text-ink/65">{t("Sur mesure", "Bespoke", "حسب الطلب")}</span>
+            <span className="text-gold">{t("Sur mesure", "Bespoke", "حسب الطلب")}</span>
           </nav>
 
-          <div className="mt-8 grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
+          <div className="mt-8 grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
             <div>
-              <p className="eyebrow-line">
-                {t("Commande sur mesure", "Bespoke commission", "طلب خاص")}
-              </p>
-              <h1 className="mt-4 max-w-2xl text-balance font-serif text-[2.9rem] font-semibold leading-[0.96] tracking-[-0.035em] sm:text-[4.2rem]">
+              <span className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-3.5 py-1 text-[0.7rem] font-medium tracking-[0.2em] text-gold uppercase">
+                <span className="h-1.5 w-1.5 rounded-full bg-gold" />
+                {t("Atelier sur mesure", "Bespoke atelier", "ورشة التفصيل والطلب الخاص")}
+              </span>
+              <h1 className="mt-5 max-w-2xl text-balance font-serif text-[2.9rem] font-semibold leading-[1.02] tracking-[-0.035em] text-white sm:text-[4.2rem]">
                 {t(
                   "Un tapis dessiné pour votre pièce.",
                   "A rug drawn for your room.",
@@ -423,7 +438,7 @@ export function CustomOrderView() {
                 )}
               </h1>
             </div>
-            <p className="max-w-md text-sm leading-[1.75] text-muted lg:justify-self-end">
+            <p className="max-w-md text-sm leading-[1.8] text-white/80 lg:justify-self-end">
               {t(
                 "Choisissez la tradition, les dimensions et les laines. Le prix se calcule au mètre carré, en direct avec l’atelier, et un acompte de 30 % réserve votre place sur le métier.",
                 "Choose the tradition, the dimensions and the wools. The price is calculated per square metre, directly with the atelier, and a 30% deposit reserves your place on the loom.",
@@ -728,6 +743,32 @@ export function CustomOrderView() {
                 )}
                 className="field-textarea"
               />
+            </div>
+
+            <div className="mt-4">
+              <label htmlFor="custom-inspiration" className="field-label">
+                {t(
+                  "Photos d'inspiration (liens, optionnel)",
+                  "Inspiration photos (links, optional)",
+                )}
+              </label>
+              <textarea
+                id="custom-inspiration"
+                value={inspirationUrls}
+                onChange={(event) => setInspirationUrls(event.target.value)}
+                rows={2}
+                placeholder={t(
+                  "https://... (une URL par ligne)",
+                  "https://... (one URL per line)",
+                )}
+                className="field-textarea"
+              />
+              <p className="mt-1 text-[0.62rem] text-muted">
+                {t(
+                  "Collez des liens d'images qui vous inspirent.",
+                  "Paste image links that inspire you.",
+                )}
+              </p>
             </div>
           </section>
 

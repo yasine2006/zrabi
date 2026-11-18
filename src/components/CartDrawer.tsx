@@ -20,7 +20,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useStore } from "@/context/StoreContext";
 import { COUNTRY_OPTIONS } from "@/lib/i18n";
 import { roundMoney } from "@/lib/money";
-import { promoDiscount } from "@/lib/promo";
+// promo removed
 import { cn } from "@/lib/utils";
 
 interface ShippingQuote {
@@ -60,20 +60,13 @@ export function CartDrawer() {
     formatRug,
     t,
     locale,
-    promo,
-    applyPromo,
-    removePromo,
   } = useStore();
 
   const [country, setCountry] = useState("MA");
   const [quote, setQuote] = useState<ShippingQuote | null>(null);
   const [quoteLoading, setQuoteLoading] = useState(false);
   const [quoteError, setQuoteError] = useState<string | null>(null);
-  const [promoInput, setPromoInput] = useState("");
-  const [promoMessage, setPromoMessage] = useState<{
-    ok: boolean;
-    text: string;
-  } | null>(null);
+  // promo removed
 
   const cartKey = cart.map((item) => item.id).join(",");
 
@@ -159,7 +152,7 @@ export function CartDrawer() {
     [cart, currency],
   );
 
-  const discount = promo ? promoDiscount(subtotal, promo.code) : 0;
+  const discount = 0;
 
   const shipping = quote
     ? currency === "MAD"
@@ -172,12 +165,7 @@ export function CartDrawer() {
   const total = roundMoney(subtotal - discount + shipping);
   const totalWeight = cart.reduce((sum, item) => sum + item.weightKg, 0);
 
-  function handleApplyPromo() {
-    if (!promoInput.trim()) return;
-    const result = applyPromo(promoInput);
-    setPromoMessage({ ok: result.ok, text: result.message });
-    if (result.ok) setPromoInput("");
-  }
+  // promo removed
 
   return (
     <AnimatePresence>
@@ -435,73 +423,7 @@ export function CartDrawer() {
                     </div>
                   </section>
 
-                  <section className="rounded-2xl border border-line/80 bg-background/60 p-4">
-                    <div className="flex items-center gap-2">
-                      <Tag className="h-4 w-4 text-terracotta" />
-                      <h3 className="text-xs font-bold uppercase tracking-[0.16em] text-ink/70">
-                        {t("Code promo", "Promo code")}
-                      </h3>
-                    </div>
-
-                    {promo ? (
-                      <div className="mt-3 flex items-center justify-between gap-2 rounded-xl bg-emerald-50 px-3 py-2.5 text-xs text-emerald-800">
-                        <span className="flex items-center gap-2 font-semibold">
-                          <Check className="h-4 w-4" />
-                          {promo.code} · −{promo.percent}%
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            removePromo();
-                            setPromoMessage(null);
-                          }}
-                          className="text-[0.65rem] underline underline-offset-2"
-                        >
-                          {t("Retirer", "Remove")}
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="mt-3 flex gap-2">
-                        <input
-                          value={promoInput}
-                          onChange={(event) => setPromoInput(event.target.value)}
-                          onKeyDown={(event) => {
-                            if (event.key === "Enter") {
-                              event.preventDefault();
-                              handleApplyPromo();
-                            }
-                          }}
-                          placeholder={t("ATLAS10", "ATLAS10")}
-                          className="h-10 min-w-0 flex-1 rounded-xl border border-line bg-surface/60 px-3 text-xs uppercase tracking-[0.08em] outline-none placeholder:normal-case placeholder:tracking-normal placeholder:text-muted/60 focus:border-terracotta"
-                        />
-                        <button
-                          type="button"
-                          onClick={handleApplyPromo}
-                          className="h-10 rounded-xl bg-ink px-4 text-[0.68rem] font-semibold text-background transition hover:bg-terracotta"
-                        >
-                          {t("Appliquer", "Apply")}
-                        </button>
-                      </div>
-                    )}
-
-                    {promoMessage ? (
-                      <p
-                        className={cn(
-                          "mt-2 text-[0.68rem]",
-                          promoMessage.ok ? "text-emerald-700" : "text-red-600",
-                        )}
-                      >
-                        {promoMessage.text}
-                      </p>
-                    ) : (
-                      <p className="mt-2 text-[0.65rem] text-muted/75">
-                        {t(
-                          "Essayez ATLAS10 pour 10 % sur les tapis.",
-                          "Try ATLAS10 for 10% off rugs.",
-                        )}
-                      </p>
-                    )}
-                  </section>
+                  {/* promo removed */}
                 </div>
               )}
             </div>

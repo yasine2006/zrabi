@@ -18,7 +18,7 @@ const rugInclude = { artisan: true } as const;
 
 export async function getStorefrontRugs() {
   try {
-    await releaseExpiredReservations().catch(() => 0);
+    releaseExpiredReservations().catch(() => 0);
 
     const rugs = await prisma.rug.findMany({
       include: rugInclude,
@@ -40,7 +40,7 @@ export async function getStorefrontRugs() {
 
 export async function getRugBySlug(slug: string) {
   try {
-    await releaseExpiredReservations().catch(() => 0);
+    releaseExpiredReservations().catch(() => 0);
 
     const rug = await prisma.rug.findUnique({
       where: { slug },

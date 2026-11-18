@@ -74,7 +74,6 @@ export function serializeAdminOrder(order: OrderForAdmin): AdminOrder {
     exchangeRate: Number(order.exchangeRate),
     subtotal: Number(order.subtotal),
     discount: Number(order.discount),
-    promoCode: order.promoCode,
     shippingCost: Number(order.shippingCost),
     totalAmount: Number(order.totalAmount),
     trackingNumber: order.trackingNumber,
@@ -206,6 +205,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     monthOrders,
     ordersToProcess,
     rates,
+    blogPosts,
   ] = await Promise.all([
     prisma.rug.findMany({
       include: { artisan: true },
@@ -251,6 +251,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       where: { status: { in: OPEN_ORDER_STATUSES } },
     }),
     getCurrencyRates(),
+    prisma.blogPost.findMany({ orderBy: { publishedAt: "desc" } }),
   ]);
 
   const todayOrders = monthOrders.filter(
@@ -308,5 +309,6 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     shippingRates: shippingRates.map(serializeAdminShippingRate),
     currencyRates: currencyRows.map(serializeAdminCurrencyRate),
     artisans,
+    blogPosts,
   };
 }

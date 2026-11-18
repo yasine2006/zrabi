@@ -117,53 +117,68 @@ export function OurStoryView({ artisans }: OurStoryViewProps) {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="relative overflow-hidden border-b border-line/70 bg-surface/35">
-        <div className="pointer-events-none absolute inset-0 bg-zellige opacity-50" />
-        <div className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-gold/[0.06] blur-3xl" />
-        <div className="container-page relative py-14 sm:py-20 lg:py-24">
+      <section className="relative overflow-hidden border-b border-line/70 bg-ink text-white">
+        <Image
+          src="https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?auto=format&fit=crop&w=2000&q=85"
+          alt="Artisanes de l'Atlas marocain"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/92 via-black/75 to-black/45" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/40" />
+        <div className="container-page relative z-10 py-16 sm:py-24 lg:py-28">
           <nav
             aria-label={t("Fil d’Ariane", "Breadcrumb", "مسار التنقل")}
-            className="flex items-center gap-2 text-[0.64rem] uppercase tracking-[0.18em] text-muted"
+            className="flex items-center gap-2 text-[0.66rem] uppercase tracking-[0.2em] text-white/60"
           >
-            <Link href="/" className="transition hover:text-terracotta">
+            <Link href="/" className="transition hover:text-gold">
               {t("Accueil", "Home", "الرئيسية")}
             </Link>
             <span>/</span>
-            <span className="text-ink/65">{t("Notre histoire", "Our story", "قصتنا")}</span>
+            <span className="text-gold">{t("Notre histoire", "Our story", "قصتنا")}</span>
           </nav>
 
-          <div className="mt-8 grid gap-9 lg:grid-cols-[1.02fr_0.98fr] lg:items-center">
+          <div className="mt-8 grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
             <div>
-              <p className="eyebrow-line">
+              <span className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-3.5 py-1 text-[0.7rem] font-medium tracking-[0.2em] text-gold uppercase">
+                <span className="h-1.5 w-1.5 rounded-full bg-gold" />
                 {t("Depuis Aït Bouguemez", "From Aït Bouguemez", "من آيت بوكماز")}
-              </p>
-              <h1 className="mt-4 max-w-2xl text-balance font-serif text-[3rem] font-semibold leading-[0.95] tracking-[-0.04em] sm:text-[4.2rem]">
+              </span>
+              <h1 className="mt-5 max-w-2xl text-balance font-serif text-[3rem] font-semibold leading-[1.02] tracking-[-0.03em] text-white sm:text-[4.2rem]">
                 {t(
                   "Nous n’avons pas inventé les tapis. Nous les avons écoutés.",
                   "We did not invent the rugs. We listened to them.",
                   "لم نبتكر الزرابي. بل أصغينا إليها.",
                 )}
               </h1>
-              <p className="mt-5 max-w-xl text-pretty text-[0.95rem] leading-[1.75] text-muted">
+              <p className="mt-6 max-w-xl text-pretty text-[1rem] leading-[1.8] text-white/80">
                 {t(
                   "Zarbia Atlas est né d’un constat simple : les plus belles pièces du Moyen Atlas quittaient les villages sans nom, sans histoire et sans prix juste. Nous avons décidé de changer le trajet, pas la matière.",
                   "Zarbia Atlas began with a simple observation: the finest pieces from the Middle Atlas left the villages without a name, a story or a fair price. We decided to change the route, not the material.",
                   "وُلدت زربية أطلس من ملاحظة بسيطة: أجمل قطع الأطلس المتوسط كانت تغادر القرى بلا اسم، بلا حكاية وبلا سعر عادل. قررنا تغيير الطريق، لا المادة.",
                 )}
               </p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Link href="/shop" className="btn-primary">
+              <div className="mt-8 flex flex-wrap gap-4">
+                <Link
+                  href="/shop"
+                  className="inline-flex items-center gap-2 rounded-full bg-gold px-7 py-3 text-sm font-semibold text-ink shadow-luxury transition hover:bg-gold-light"
+                >
                   {t("Découvrir les pièces", "Discover the pieces", "اكتشف القطع")}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
-                <Link href="/custom-order" className="btn-ghost">
+                <Link
+                  href="/custom-order"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-7 py-3 text-sm font-semibold text-white backdrop-blur-md transition hover:bg-white/20"
+                >
                   {t("Commander sur mesure", "Commission bespoke", "اطلب حسب المقاس")}
                 </Link>
               </div>
             </div>
 
-            <div className="relative">
-              <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] bg-wool">
+            <div className="relative lg:justify-self-end">
+              <div className="relative aspect-[4/5] w-full max-w-md overflow-hidden rounded-[2.5rem] border border-white/20 shadow-2xl">
                 <Image
                   src={
                     artisans[0]?.photoUrl ??
@@ -172,48 +187,42 @@ export function OurStoryView({ artisans }: OurStoryViewProps) {
                   alt={t(
                     "Artisane tissant sur un métier traditionnel",
                     "Artisan weaving on a traditional loom",
+                    "حرفية تنسج على نول تقليدي",
                   )}
                   fill
                   priority
                   sizes="(min-width: 1024px) 46vw, 100vw"
                   className="object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/45 via-transparent to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4 rounded-2xl border border-white/20 bg-ink/55 p-4 text-background backdrop-blur">
-                  <p className="text-[0.56rem] font-bold uppercase tracking-[0.2em] text-gold">
-                    {t("Atelier partenaire", "Partner atelier")}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                <div className="absolute bottom-6 left-6 right-6 text-white">
+                  <p className="text-xs uppercase tracking-widest text-gold font-medium">
+                    {artisans[0]?.village ?? "Aït Bouguemez"}
                   </p>
-                  <p className="mt-1 font-serif text-2xl font-semibold">
-                    {artisans[0]
-                      ? locale === "ar"
-                        ? artisans[0].nameFr
-                        : locale === "en"
-                          ? artisans[0].nameEn
-                          : artisans[0].nameFr
-                      : "Aït Bouguemez"}
+                  <p className="font-serif text-xl font-medium mt-1">
+                    {(locale === "en" ? artisans[0]?.nameEn : artisans[0]?.nameFr) ??
+                      "Malika & les tisseuses"}
                   </p>
-                  <p className="mt-0.5 text-[0.68rem] text-background/65">
-                    {artisans[0]
-                      ? `${artisans[0].village} · ${artisans[0].region}`
-                      : "Moyen Atlas, Maroc"}
+                  <p className="text-xs text-white/70 mt-1">
+                    {t("Laine pure de l’Atlas filée à la main", "Pure handspun Atlas wool", "صوف أطلسي خالص مغزول يدوياً")}
                   </p>
                 </div>
               </div>
             </div>
           </div>
 
-          <dl className="mt-10 grid grid-cols-2 gap-4 border-t border-line/80 pt-6 sm:grid-cols-4">
+          <dl className="mt-12 grid grid-cols-2 gap-4 border-t border-white/20 pt-8 sm:grid-cols-4">
             {[
-              ["3", t("villages partenaires", "partner villages")],
-              ["5", t("traditions tissées", "woven traditions")],
-              ["100 %", t("laine naturelle", "natural wool")],
-              ["0", t("intermédiaire", "middleman")],
+              ["3", t("villages partenaires", "partner villages", "قرى شريكة")],
+              ["5", t("traditions tissées", "woven traditions", "تقاليد منسوجة")],
+              ["100 %", t("laine naturelle", "natural wool", "صوف طبيعي 100%")],
+              ["0", t("intermédiaire", "middleman", "وسيط")],
             ].map(([value, label]) => (
               <div key={label}>
-                <dt className="font-serif text-3xl font-semibold text-ink">
+                <dt className="font-serif text-3xl font-semibold text-gold">
                   {value}
                 </dt>
-                <dd className="mt-0.5 text-[0.62rem] uppercase tracking-[0.14em] text-muted">
+                <dd className="mt-1 text-[0.68rem] uppercase tracking-[0.16em] text-white/80">
                   {label}
                 </dd>
               </div>

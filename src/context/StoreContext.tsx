@@ -15,11 +15,7 @@ import type { SerializedRug } from "@/lib/api/serializers";
 import { INITIAL_STORE_RUGS, MOCK_RATES } from "@/lib/initial-data";
 import { DEFAULT_LOCALE, pick, type Locale } from "@/lib/i18n";
 import { formatPrice as formatMoney, type CurrencyCode } from "@/lib/money";
-import {
-  getPromo,
-  normalizePromoCode,
-  type AppliedPromo,
-} from "@/lib/promo";
+// promo module removed
 
 export const CART_HOLD_MINUTES = 15;
 export const CART_HOLD_MS = CART_HOLD_MINUTES * 60 * 1000;
@@ -28,7 +24,7 @@ const STORAGE = {
   cart: "zarbia.cart.v1",
   currency: "zarbia.currency.v1",
   locale: "zarbia.locale.v1",
-  promo: "zarbia.promo.v1",
+  // promo removed
   favorites: "zarbia.favorites.v1",
   orders: "zarbia.orders.v1",
   paymentSettings: "zarbia.paymentSettings.v1",
@@ -74,7 +70,6 @@ export interface CreateOrderInput {
   items?: Array<{ rugId: string; quantity?: number }>;
   paymentMethod?: PaymentMethodValue;
   currency?: CurrencyCode;
-  promoCode?: string;
   customerNote?: string;
 }
 
@@ -133,9 +128,7 @@ export interface StoreContextValue {
   orders: CreatedOrder[];
   createOrder: (input: CreateOrderInput) => Promise<CreatedOrder>;
 
-  promo: AppliedPromo | null;
-  applyPromo: (code: string) => { ok: boolean; message: string };
-  removePromo: () => void;
+  // promo removed
   hydrated: boolean;
 
   format: (amount: number, code?: CurrencyCode) => string;
@@ -271,19 +264,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [currency, setCurrencyState] = useState<CurrencyCode>("MAD");
   const [locale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE);
-  const [promo, setPromo] = useState<AppliedPromo | null>(null);
+  // promo removed
   const [favorites, setFavorites] = useState<string[]>([]);
   const [orders, setOrders] = useState<CreatedOrder[]>([]);
   const [reservationExpiry, setReservationExpiry] = useState<number | null>(null);
   const [now, setNow] = useState(() => Date.now());
   const [hydrated, setHydrated] = useState(false);
-  const promoRef = useRef<AppliedPromo | null>(null);
 
   useEffect(() => {
     const savedCart = readCart(readString(STORAGE.cart));
     const savedCurrency = readString(STORAGE.currency);
     const savedLocale = readString(STORAGE.locale);
-    const savedPromo = getPromo(readString(STORAGE.promo));
     const savedFavorites = readIdList(readString(STORAGE.favorites));
     const savedOrders = readOrders(readString(STORAGE.orders));
 
@@ -299,10 +290,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }
     if (savedLocale === "fr" || savedLocale === "en" || savedLocale === "ar") {
       setLocaleState(savedLocale);
-    }
-    if (savedPromo) {
-      setPromo(savedPromo);
-      promoRef.current = savedPromo;
     }
     setNow(Date.now());
     setHydrated(true);
@@ -405,19 +392,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       /* ignore */
     }
   }, [orders, hydrated]);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    try {
-      if (promoRef.current) {
-        window.localStorage.setItem(STORAGE.promo, promoRef.current.code);
-      } else {
-        window.localStorage.removeItem(STORAGE.promo);
-      }
-    } catch {
-      /* ignore */
-    }
-  }, [promo, hydrated]);
 
   useEffect(() => {
     if (cart.length === 0 && reservationExpiry === null) return;
@@ -564,7 +538,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           items,
           paymentMethod,
           currency: orderCurrency,
-          promoCode: input.promoCode,
           customerNote: input.customerNote,
         }),
       });
@@ -606,8 +579,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setCart([]);
       setReservationExpiry(null);
       setIsCartOpen(false);
-      promoRef.current = null;
-      setPromo(null);
       return created;
     },
     [cart, currency, locale],
@@ -636,33 +607,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     (fr: string, en: string, ar?: string) => pick(locale, fr, en, ar),
     [locale],
   );
-
-  const applyPromo = useCallback(
-    (code: string) => {
-      const normalized = normalizePromoCode(code);
-      const found = getPromo(normalized);
-      if (!found) {
-        return {
-          ok: false,
-          message: pick(
-            locale,
-            "Ce code n’est pas reconnu. Essayez ATLAS10.",
-            "That code is not recognised. Try ATLAS10.",
-            "هذا الكود غير معروف. جرّب ATLAS10.",
-          ),
-        };
-      }
-      promoRef.current = found;
-      setPromo(found);
-      return { ok: true, message: pick(locale, found.labelFr, found.labelEn) };
-    },
-    [locale],
-  );
-
-  const removePromo = useCallback(() => {
-    promoRef.current = null;
-    setPromo(null);
-  }, []);
 
   const value = useMemo<StoreContextValue>(
     () => ({
@@ -702,9 +646,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       orders,
       createOrder,
 
-      promo,
-      applyPromo,
-      removePromo,
+      // promo removed
       hydrated,
 
       format,
@@ -713,7 +655,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     [
       addRug,
       addToCart,
-      applyPromo,
       cart,
       clearCart,
       closeCart,
@@ -732,11 +673,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       now,
       openCart,
       orders,
-      promo,
       refreshHold,
       removeFromCart,
       removeItem,
-      removePromo,
       reservationExpiry,
       rugs,
       setCurrency,

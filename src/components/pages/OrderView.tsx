@@ -674,10 +674,7 @@ export function OrderView({ order, paymentFlag }: OrderViewProps) {
                   </div>
                   {order.discount > 0 ? (
                     <div className="flex justify-between text-emerald-700">
-                      <dt>
-                        {t("Remise", "Discount")}
-                        {order.promoCode ? ` · ${order.promoCode}` : ""}
-                      </dt>
+                      <dt>{t("Remise", "Discount")}</dt>
                       <dd>−{money(order.discount)}</dd>
                     </div>
                   ) : null}

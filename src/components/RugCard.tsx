@@ -83,6 +83,7 @@ export function RugCard({ rug, priority = false, index = 0 }: RugCardProps) {
                 alt={locale === "ar" ? (rug.nameAr ?? rug.nameFr) : locale === "en" ? rug.nameEn : rug.nameFr}
                 fill
                 priority={priority}
+                unoptimized
                 sizes="(min-width: 1280px) 24vw, (min-width: 768px) 45vw, 90vw"
                 className="object-cover"
               />
@@ -100,6 +101,7 @@ export function RugCard({ rug, priority = false, index = 0 }: RugCardProps) {
                 src={secondary}
                 alt=""
                 fill
+                unoptimized
                 sizes="(min-width: 1280px) 24vw, (min-width: 768px) 45vw, 90vw"
                 className="object-cover"
               />

@@ -36,7 +36,9 @@ const SORT_MAP: Record<
  */
 export async function GET(request: Request) {
   try {
-    const releasedReservations = await releaseExpiredReservations();
+    // Release expired holds without blocking the catalogue response.
+    releaseExpiredReservations().catch(() => 0);
+    const releasedReservations = 0;
 
     const url = new URL(request.url);
     const raw: Record<string, string> = {};
