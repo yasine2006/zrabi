@@ -121,7 +121,7 @@ export const rugCreateSchema = z.object({
   status: z.nativeEnum(RugStatus).default(RugStatus.AVAILABLE),
   isMadeToOrder: z.boolean().default(false),
   photos: rugPhotos,
-  videoUrl: optionalUrl,
+  videoUrl: z.string().trim().min(1).max(2048).nullable().optional(),
   certificateId: z.string().trim().min(1).max(120).optional(),
   artisanId: z.string().trim().min(1, "An artisan id is required."),
 });
@@ -248,7 +248,7 @@ export const adminRugUpdateSchema = rugCreateSchema.partial().extend({
   // An empty string clears the column instead of silently keeping the old URL.
   videoUrl: z.preprocess(
     (value) => (value === "" ? null : value),
-    z.string().trim().url().max(2048).nullable().optional(),
+    z.string().trim().min(1).max(2048).nullable().optional(),
   ),
   certificateId: z.string().trim().max(120).nullable().optional(),
 });

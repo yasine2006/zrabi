@@ -578,6 +578,32 @@ function RugEditorModal({
     event.target.value = "";
   }
 
+  async function handleVideoUpload(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data?.error?.message ?? "Upload failed");
+      }
+      const data = (await res.json()) as { url: string };
+      setForm((curr) => ({ ...curr, videoUrl: data.url }));
+    } catch (cause) {
+      setError(
+        cause instanceof Error ? cause.message : t("Échec de l'envoi.", "Upload failed.", "فشل الرفع."),
+      );
+    } finally {
+      event.target.value = "";
+    }
+  }
+
   function handleRemovePhoto(index: number) {
     setForm((curr) => {
       const next = curr.photos.filter((_, i) => i !== index);
@@ -1091,6 +1117,39 @@ function RugEditorModal({
               </label>
             </div>
 
+            <div className="rounded-2xl border border-line bg-surface/30 p-4">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold uppercase tracking-[0.16em] text-ink/70">
+                  {t("Vidéo (optionnel)", "Video (optional)", "فيديو (اختياري)")}
+                </span>
+              </div>
+              {form.videoUrl ? (
+                <div className="mt-3 flex items-center justify-between gap-2 rounded-xl bg-emerald-50 px-3 py-2 text-xs text-emerald-800">
+                  <span className="truncate font-mono">{form.videoUrl}</span>
+                  <button
+                    type="button"
+                    onClick={() => setForm((curr) => ({ ...curr, videoUrl: "" }))}
+                    className="text-[0.65rem] underline underline-offset-2"
+                  >
+                    {t("Retirer", "Remove", "إزالة")}
+                  </button>
+                </div>
+              ) : (
+                <label className="btn-secondary mt-3 inline-flex cursor-pointer items-center gap-2 px-4 py-2 text-xs">
+                  <span>{t("Importer une vidéo", "Import a video", "استيراد فيديو")}</span>
+                  <input
+                    type="file"
+                    accept="video/*"
+                    onChange={handleVideoUpload}
+                    className="hidden"
+                  />
+                </label>
+              )}
+              <p className="mt-2 text-[0.62rem] text-muted">
+                {t("MP4, WebM, MOV — max 50 MB", "MP4, WebM, MOV — max 50 MB", "MP4, WebM, MOV — 50 MB كحد أقصى")}
+              </p>
+            </div>
+
             <div className="flex gap-2">
               <input
                 type="url"
@@ -1171,13 +1230,13 @@ function RugEditorModal({
 
             <div className="grid gap-4 pt-2 sm:grid-cols-2">
               <label className="block">
-                <span className="field-label">{t("Vidéo (URL, optionnel)", "Video (URL, optional)", "فيديو (رابط، اختياري)")}</span>
+                <span className="field-label">{t("Vidéo (URL ou chemin, optionnel)", "Video (URL or path, optional)", "فيديو (رابط أو مسار، اختياري)")}</span>
                 <input
-                  type="url"
+                  type="text"
                   value={form.videoUrl}
                   onChange={(event) => set("videoUrl", event.target.value)}
                   className="field"
-                  placeholder="https://…/video.mp4"
+                  placeholder="https://…/video.mp4 ou /uploads/…"
                 />
               </label>
               <label className="block">

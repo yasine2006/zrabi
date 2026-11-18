@@ -7,12 +7,17 @@ import { handleApiError } from "@/lib/api/errors";
 
 export const dynamic = "force-dynamic";
 
-const MAX_BYTES = 8 * 1024 * 1024; // 8 MB
+const MAX_IMAGE_BYTES = 8 * 1024 * 1024; // 8 MB
+const MAX_VIDEO_BYTES = 50 * 1024 * 1024; // 50 MB
 const ALLOWED = new Set([
   "image/jpeg",
   "image/png",
   "image/webp",
   "image/avif",
+  "video/mp4",
+  "video/webm",
+  "video/quicktime",
+  "video/x-matroska",
 ]);
 
 /**
@@ -43,17 +48,27 @@ export async function POST(request: Request) {
       );
     }
 
-    if (file.size > MAX_BYTES) {
+    const isVideo = file.type.startsWith("video/");
+    const maxBytes = isVideo ? MAX_VIDEO_BYTES : MAX_IMAGE_BYTES;
+    if (file.size > maxBytes) {
       return NextResponse.json(
-        { error: { message: "File too large (max 8 MB)." } },
+        {
+          error: {
+            message: isVideo
+              ? "File too large (max 50 MB for videos)."
+              : "File too large (max 8 MB for images).",
+          },
+        },
         { status: 413 },
       );
     }
 
     const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-    const safeExt = ["jpg", "jpeg", "png", "webp", "avif"].includes(ext)
-      ? ext
-      : "jpg";
+    const safeExts = [
+      "jpg", "jpeg", "png", "webp", "avif",
+      "mp4", "webm", "mov", "mkv",
+    ];
+    const safeExt = safeExts.includes(ext) ? ext : isVideo ? "mp4" : "jpg";
     const filename = `${randomUUID()}.${safeExt}`;
 
     const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
