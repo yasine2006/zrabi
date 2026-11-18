@@ -5,11 +5,13 @@ import {
   ArrowRight,
   ArrowUpRight,
   BadgeCheck,
+  Building2,
   CheckCircle2,
   Globe2,
   Hand,
   Mail,
   MapPin,
+  MessageCircle,
   Quote,
   ShieldCheck,
   Sparkles,
@@ -23,6 +25,7 @@ import type { SerializedRug } from "@/lib/api/serializers";
 import { RUG_TYPES, rugTypeLabel } from "@/lib/i18n";
 import type { StorefrontArtisan } from "@/lib/storefront";
 import { cn } from "@/lib/utils";
+import { getSupportWhatsAppLink } from "@/lib/whatsapp";
 
 interface HomeViewProps {
   rugs: SerializedRug[];
@@ -45,6 +48,17 @@ export function HomeView({ rugs, artisan }: HomeViewProps) {
   const [subscribed, setSubscribed] = useState(false);
   const [newsletterBusy, setNewsletterBusy] = useState(false);
   const [newsletterError, setNewsletterError] = useState<string | null>(null);
+
+  const b2bWhatsAppLink = useMemo(() => {
+    const text =
+      locale === "ar"
+        ? "مرحباً زربية أطلس، أود الاستفسار عن الشراء بالجملة وطلبات المشاريع (B2B)."
+        : locale === "en"
+          ? "Hello Zarbia Atlas, I would like to inquire about wholesale B2B orders and hospitality projects."
+          : "Bonjour Zarbia Atlas, je souhaite me renseigner sur les commandes en gros / B2B pour un projet.";
+
+    return getSupportWhatsAppLink({ locale, message: text });
+  }, [locale]);
 
   async function subscribe(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -637,6 +651,122 @@ export function HomeView({ rugs, artisan }: HomeViewProps) {
                 </div>
               </Link>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------- B2B & Wholesale */}
+      <section className="container-page pb-20 pt-6">
+        <div className="relative overflow-hidden rounded-[2.5rem] border border-gold/30 bg-ink p-8 text-white shadow-2xl sm:p-12 lg:p-16">
+          <div className="pointer-events-none absolute -right-20 -top-20 h-96 w-96 rounded-full bg-gold/10 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-20 -left-20 h-96 w-96 rounded-full bg-terracotta/15 blur-3xl" />
+
+          <div className="relative z-10 grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+            <div>
+              <span className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-3.5 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-gold">
+                <Building2 className="h-3.5 w-3.5" />
+                {t(
+                  "Service B2B · Vente en Gros & Projets",
+                  "B2B Service · Wholesale & Projects",
+                  "قسم المشاريع والبيع بالجملة (B2B)",
+                )}
+              </span>
+
+              <h2 className="mt-5 font-serif text-3xl font-semibold leading-[1.05] tracking-[-0.03em] sm:text-5xl lg:text-[3.2rem]">
+                {t(
+                  "Vous souhaitez acheter en quantité ou aménager un lieu ?",
+                  "Looking to order in volume or furnish a luxury space?",
+                  "هل ترغب في الشراء بكميات أو تأثيث مشاريع كبرى؟",
+                )}
+              </h2>
+
+              <p className="mt-4 max-w-xl text-sm leading-[1.8] text-white/80 sm:text-base">
+                {t(
+                  "Hôtels, riads, architectes d'intérieur, décorateurs et boutiques internationales : Zarbia Atlas tisse vos collections sur mesure en gros avec tarifs dégressifs d'atelier, accompagnement personnalisé et expédition sécurisée dans le monde entier.",
+                  "Hotels, riads, interior architects, decorators and global retailers: Zarbia Atlas crafts your bespoke bulk orders directly from the loom with volume tier pricing, direct atelier coordination and insured worldwide freight.",
+                  "فنادق، رياضات، مهندسو ديكور ومتاجر عالمية: توفر زربية أطلس خدمة الشراء بالجملة وتجهيز المشاريع بكميات كبرى، بأسعار تفضيلية من ورشات الأطلس مباشرة، مع شهادات أصالة وشحن مؤمن لجميع دول العالم.",
+                )}
+              </p>
+
+              <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur">
+                  <p className="text-sm font-bold text-gold">
+                    {t("Tarifs dégressifs", "Volume discounts", "أسعار تفضيلية بالجملة")}
+                  </p>
+                  <p className="mt-1 text-xs text-white/70">
+                    {t(
+                      "Prix directs d'atelier pour commandes groupées.",
+                      "Direct atelier rates for bulk volume orders.",
+                      "أثمنة الورشة المباشرة للطلبيات الكبيرة.",
+                    )}
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur">
+                  <p className="text-sm font-bold text-gold">
+                    {t("Dimensions & Couleurs", "Custom dimensions", "مقاسات وألوان مخصصة")}
+                  </p>
+                  <p className="mt-1 text-xs text-white/70">
+                    {t(
+                      "Tissage selon vos plans et votre nuancier.",
+                      "Woven to match your blueprints and palette.",
+                      "نسيج حسب مخططاتك وتدرجاتك اللونية.",
+                    )}
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur">
+                  <p className="text-sm font-bold text-gold">
+                    {t("Export & Certificats", "Global export", "تصدير وشهادات أصالة")}
+                  </p>
+                  <p className="mt-1 text-xs text-white/70">
+                    {t(
+                      "Certificats nominatifs et fret international.",
+                      "Certificates of origin and insured air/sea freight.",
+                      "شهادات معتمدة وشحن دولي سريع ومؤمن.",
+                    )}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative rounded-3xl border border-white/15 bg-white/5 p-6 backdrop-blur sm:p-8 lg:justify-self-end">
+              <div className="flex items-center gap-3">
+                <span className="grid h-10 w-10 place-items-center rounded-full bg-emerald-500 text-white">
+                  <MessageCircle className="h-5 w-5" />
+                </span>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wider text-gold">
+                    {t("Contact Direct Atelier", "Direct Atelier Contact", "تواصل مباشر مع الورشة")}
+                  </p>
+                  <p className="font-serif text-lg font-semibold text-white">
+                    {t("Service Pro & WhatsApp", "Pro & Wholesale WhatsApp", "خدمة المشاريع عبر واتساب")}
+                  </p>
+                </div>
+              </div>
+
+              <p className="mt-4 text-xs leading-relaxed text-white/75">
+                {t(
+                  "Échangez directement avec notre équipe pour recevoir notre catalogue professionnel, un devis personnalisé sous 24h et des échantillons de laine.",
+                  "Chat directly with our team to get our trade catalogue, a tailored quote within 24 hours, and authentic wool samples.",
+                  "تواصل مباشرة مع فريقنا للتوصل بالكتالوج المخصص للمشاريع، دراسة مقاساتك وتقديم عرض أسعار تفضيلي خلال 24 ساعة.",
+                )}
+              </p>
+
+              <a
+                href={b2bWhatsAppLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-6 flex w-full items-center justify-center gap-2.5 rounded-full bg-emerald-600 px-6 py-3.5 text-sm font-semibold text-white shadow-lift transition hover:bg-emerald-500 active:scale-95"
+              >
+                <MessageCircle className="h-4 w-4" />
+                <span>
+                  {t(
+                    "Contacter le service B2B sur WhatsApp",
+                    "Contact Wholesale Desk on WhatsApp",
+                    "تواصل بخصوص طلبات الجملة عبر واتساب",
+                  )}
+                </span>
+              </a>
+            </div>
           </div>
         </div>
       </section>

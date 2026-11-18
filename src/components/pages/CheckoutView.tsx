@@ -19,6 +19,7 @@ import {
   UserRound,
   Wallet,
   X,
+  Info,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -1030,6 +1031,57 @@ export function CheckoutView() {
                   </span>
                 </div>
               </div>
+
+              {/* COD payment stages explanation */}
+              {payment === "COD" && isMorocco ? (
+                <div className="mt-3 rounded-2xl border border-gold/30 bg-gold/[0.07] px-4 py-4">
+                  <p className="flex items-center gap-2 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-ink/70">
+                    <Info className="h-3.5 w-3.5 shrink-0 text-gold" />
+                    {t(
+                      "Comment se déroule le paiement à la livraison ?",
+                      "How does cash on delivery work?",
+                      "كيف يتم الدفع عند الاستلام؟",
+                    )}
+                  </p>
+                  <ol className="mt-3 space-y-2.5">
+                    {[
+                      {
+                        step: "1",
+                        fr: "Vous passez votre commande — aucun paiement maintenant.",
+                        en: "You place your order — no payment now.",
+                        ar: "تقدم طلبك الآن — لا دفع في هذه المرحلة.",
+                      },
+                      {
+                        step: "2",
+                        fr: "Notre équipe vous appelle pour confirmer et convenir d'un acompte de réservation (avance).",
+                        en: "Our team calls to confirm and agree on a small reservation deposit (advance).",
+                        ar: "يتصل بكم فريقنا لتأكيد الطلب والاتفاق على دفعة حجز أولية (تسبيق).",
+                      },
+                      {
+                        step: "3",
+                        fr: "Votre pièce est préparée en atelier et lavée en montagne.",
+                        en: "Your piece is prepared in the workshop and mountain-washed.",
+                        ar: "تُحضَّر قطعتكم في الورشة وتُغسل بمياه الجبال.",
+                      },
+                      {
+                        step: "4",
+                        fr: "À la livraison, vous réglez le solde restant au livreur. C'est tout !",
+                        en: "At delivery, you pay the remaining balance to the courier. That's it!",
+                        ar: "عند الاستلام، تسددون الباقي للمندوب. هذا كل شيء!",
+                      },
+                    ].map((item) => (
+                      <li key={item.step} className="flex items-start gap-3">
+                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gold/20 text-[0.6rem] font-bold text-ink/80 ring-1 ring-gold/30">
+                          {item.step}
+                        </span>
+                        <span className="text-[0.68rem] leading-relaxed text-ink/75">
+                          {locale === "ar" ? item.ar : locale === "en" ? item.en : item.fr}
+                        </span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              ) : null}
 
               {paymentBlocked ? (
                 <p className="mt-3 flex items-start gap-2 rounded-xl bg-gold/15 px-3.5 py-2.5 text-[0.66rem] leading-relaxed text-ink/80">

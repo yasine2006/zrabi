@@ -7,8 +7,8 @@ import { handleApiError } from "@/lib/api/errors";
 
 export const dynamic = "force-dynamic";
 
-const MAX_IMAGE_BYTES = 8 * 1024 * 1024; // 8 MB
-const MAX_VIDEO_BYTES = 50 * 1024 * 1024; // 50 MB
+const MAX_IMAGE_BYTES = 2.5 * 1024 * 1024; // 2.5 MB max on server (client auto-compresses to ~200-350 KB)
+const MAX_VIDEO_BYTES = 18 * 1024 * 1024; // 18 MB max (optimal for 15-30s showcase clips)
 const ALLOWED = new Set([
   "image/jpeg",
   "image/png",
@@ -55,8 +55,8 @@ export async function POST(request: Request) {
         {
           error: {
             message: isVideo
-              ? "File too large (max 50 MB for videos)."
-              : "File too large (max 8 MB for images).",
+              ? "File too large (max 18 MB for videos)."
+              : "File too large (max 2.5 MB for images).",
           },
         },
         { status: 413 },

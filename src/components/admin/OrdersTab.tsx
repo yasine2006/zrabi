@@ -39,6 +39,83 @@ const FILTERS = [
   { value: "DELIVERED", label: "Livrées", labelEn: "Delivered", labelAr: "مُسلَّمة" },
 ] as const;
 
+const ORDER_STATUS_DETAILS: Record<
+  string,
+  {
+    step: number;
+    fr: string;
+    en: string;
+    ar: string;
+  }
+> = {
+  PENDING: {
+    step: 1,
+    fr: "1. En attente (Nouvelle commande)",
+    en: "1. Pending (New Order)",
+    ar: "1. قيد الانتظار (طلب جديد)",
+  },
+  PENDING_COD: {
+    step: 1,
+    fr: "1. Commande reçue (À confirmer)",
+    en: "1. Order Placed (To Confirm)",
+    ar: "1. تم الطلب (في انتظار التأكيد)",
+  },
+  CONFIRMED_COD: {
+    step: 2,
+    fr: "2. Confirmée & Acompte convenu",
+    en: "2. Confirmed & Deposit Agreed",
+    ar: "2. مؤكد مع الاتفاق على التسبيق",
+  },
+  PAID: {
+    step: 2,
+    fr: "2. Payée intégralement par carte",
+    en: "2. Paid in Full by Card",
+    ar: "2. مدفوع بالكامل بالبطاقة",
+  },
+  PREPARING: {
+    step: 3,
+    fr: "3. En atelier & Lavage de montagne",
+    en: "3. In Workshop & Mountain Wash",
+    ar: "3. في الورشة والغسيل الجبلي",
+  },
+  SHIPPED: {
+    step: 4,
+    fr: "4. Expédiée & En cours de livraison",
+    en: "4. Shipped & In Transit",
+    ar: "4. تم الشحن وقيد التوصيل",
+  },
+  DELIVERED: {
+    step: 5,
+    fr: "5. Livrée au client",
+    en: "5. Delivered to Client",
+    ar: "5. تم التسليم للعميل",
+  },
+  CASH_COLLECTED: {
+    step: 6,
+    fr: "6. Livrée & Solde entièrement encaissé",
+    en: "6. Delivered & Balance Collected",
+    ar: "6. مسلّمة وتم تحصيل الباقي بالكامل",
+  },
+  CANCELLED: {
+    step: 0,
+    fr: "Annulée",
+    en: "Cancelled",
+    ar: "ملغاة",
+  },
+  REFUNDED: {
+    step: 0,
+    fr: "Remboursée",
+    en: "Refunded",
+    ar: "مُسترجعة",
+  },
+  FAILED: {
+    step: 0,
+    fr: "Échouée",
+    en: "Failed",
+    ar: "فاشلة",
+  },
+};
+
 const STATUSES = [
   "PENDING",
   "PENDING_COD",
@@ -386,10 +463,50 @@ export function OrdersTab({ orders, canWrite, onMutated }: OrdersTabProps) {
                           </a>
                         </div>
 
+                        {/* 5-Step Visual Progress Stepper */}
+                        <div className="rounded-2xl border border-line bg-surface/40 p-3.5">
+                          <p className="text-[0.6rem] font-bold uppercase tracking-[0.16em] text-gold mb-2.5">
+                            {t("Étapes de la commande", "Order Milestones", "مراحل تنفيذ الطلب")}
+                          </p>
+                          <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-5 text-center text-[0.62rem]">
+                            {[
+                              { num: "1", key: "PENDING_COD", fr: "1. Reçue", en: "1. Placed", ar: "1. استلام الطلب" },
+                              { num: "2", key: "CONFIRMED_COD", fr: "2. Acompte convenu", en: "2. Deposit", ar: "2. تسبيق الحجز" },
+                              { num: "3", key: "PREPARING", fr: "3. En atelier", en: "3. Workshop", ar: "3. في الورشة" },
+                              { num: "4", key: "SHIPPED", fr: "4. Expédiée", en: "4. Shipped", ar: "4. جاري التوصيل" },
+                              { num: "5", key: "CASH_COLLECTED", fr: "5. Livré & Soldé", en: "5. Delivered & Paid", ar: "5. تم التسليم واستلام الباقي" },
+                            ].map((st) => {
+                              const active =
+                                form.status === st.key ||
+                                (st.key === "CONFIRMED_COD" && (form.status === "PAID" || form.status === "CONFIRMED_COD")) ||
+                                (st.key === "CASH_COLLECTED" && (form.status === "DELIVERED" || form.status === "CASH_COLLECTED"));
+
+                              return (
+                                <button
+                                  key={st.num}
+                                  type="button"
+                                  onClick={() => canWrite && setForm((curr) => ({ ...curr, status: st.key }))}
+                                  className={cn(
+                                    "p-2 rounded-xl border text-center transition",
+                                    active
+                                      ? "border-gold bg-gold/15 text-ink font-bold shadow-sm ring-1 ring-gold/30"
+                                      : "border-line/60 bg-background/60 text-muted hover:border-terracotta/40",
+                                  )}
+                                >
+                                  <span className="block font-bold">{st.num}</span>
+                                  <span className="block mt-0.5 truncate">
+                                    {locale === "ar" ? st.ar : locale === "en" ? st.en : st.fr}
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+
                         {canWrite ? (
                           <>
                             <label className="block">
-                              <span className="field-label">{t("Statut", "Status", "الوضع")}</span>
+                              <span className="field-label">{t("Statut de la commande", "Order Status", "حالة الطلب")}</span>
                               <select
                                 value={form.status}
                                 onChange={(event) =>
@@ -398,13 +515,24 @@ export function OrdersTab({ orders, canWrite, onMutated }: OrdersTabProps) {
                                     status: event.target.value,
                                   }))
                                 }
-                                className="field"
+                                className="field font-medium"
                               >
-                                {STATUSES.map((value) => (
-                                  <option key={value} value={value}>
-                                    {value}
-                                  </option>
-                                ))}
+                                {STATUSES.map((value) => {
+                                  const details = ORDER_STATUS_DETAILS[value];
+                                  const label = details
+                                    ? locale === "ar"
+                                      ? details.ar
+                                      : locale === "en"
+                                        ? details.en
+                                        : details.fr
+                                    : value;
+
+                                  return (
+                                    <option key={value} value={value}>
+                                      {label}
+                                    </option>
+                                  );
+                                })}
                               </select>
                             </label>
 

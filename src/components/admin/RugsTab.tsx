@@ -24,6 +24,7 @@ import type {
 import type { RugStatus, RugType } from "@prisma/client";
 import type { SerializedRug } from "@/lib/api/serializers";
 import { cn } from "@/lib/utils";
+import { compressImage } from "@/lib/image-compress";
 import {
   AdminCard,
   apiRequest,
@@ -552,8 +553,10 @@ function RugEditorModal({
     const filesToUpload = Array.from(files).slice(0, remainingSlots);
     for (const file of filesToUpload) {
       try {
+        // Automatically optimize & compress photo to sharp WebP (< 350 KB)
+        const optimizedFile = await compressImage(file, 1920, 0.82);
         const formData = new FormData();
-        formData.append("file", file);
+        formData.append("file", optimizedFile);
         const res = await fetch("/api/admin/upload", {
           method: "POST",
           body: formData,
@@ -581,6 +584,20 @@ function RugEditorModal({
   async function handleVideoUpload(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
+
+    // Strict limit: max 18 MB to ensure hundreds of rugs can be stored safely
+    if (file.size > 18 * 1024 * 1024) {
+      setError(
+        t(
+          `La vidéo dépasse 18 MB (${(file.size / (1024 * 1024)).toFixed(1)} MB). Pour garder votre base légère et ajouter +100 tapis, choisissez une courte vidéo de 15 à 30 secondes ou utilisez un lien YouTube/Vimeo.`,
+          `Video exceeds 18 MB (${(file.size / (1024 * 1024)).toFixed(1)} MB). Please pick a 15-30s video or use a YouTube/Vimeo link to save storage.`,
+          `حجم الفيديو يتجاوز 18 ميغابايت (${(file.size / (1024 * 1024)).toFixed(1)} ميغابايت). للحفاظ على مساحة التخزين وإضافة +100 زربية، يرجى اختيار فيديو قصير (15-30 ثانية) أو وضع رابط YouTube / Vimeo.`,
+        ),
+      );
+      event.target.value = "";
+      return;
+    }
+
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -1103,8 +1120,17 @@ function RugEditorModal({
                 Importer des photos depuis votre ordinateur
               </p>
               <p className="mt-1 text-[0.66rem] text-muted">
-                {t("Glissez-déposez ou sélectionnez jusqu'à 10 photos (JPEG, PNG, WebP)", "Drag and drop or select up to 10 photos (JPEG, PNG, WebP)", "اسحب وأفلت أو اختر до 10 صور (JPEG, PNG, WebP)")}
+                {t("Glissez-déposez ou sélectionnez jusqu'à 10 photos (JPEG, PNG, WebP)", "Drag and drop or select up to 10 photos (JPEG, PNG, WebP)", "اسحب وأفلت أو اختر حتى 10 صور (JPEG, PNG, WebP)")}
               </p>
+              <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-[0.64rem] font-medium text-emerald-800">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                {t(
+                  "Optimisation automatique active (< 350 KB par photo)",
+                  "Automatic compression enabled (< 350 KB per photo)",
+                  "الضغط التلقائي مفعل (< 350 كيلوبايت للصورة لتوفير المساحة)",
+                )}
+              </div>
+              <br />
               <label className="btn-secondary mt-3 inline-flex cursor-pointer items-center gap-2 px-4 py-2 text-xs">
                 <span>Choisir des fichiers</span>
                 <input
@@ -1146,7 +1172,11 @@ function RugEditorModal({
                 </label>
               )}
               <p className="mt-2 text-[0.62rem] text-muted">
-                {t("MP4, WebM, MOV — max 50 MB", "MP4, WebM, MOV — max 50 MB", "MP4, WebM, MOV — 50 MB كحد أقصى")}
+                {t(
+                  "MP4, WebM — max 18 MB (conseillé : 15 à 30 secondes). Vous pouvez aussi utiliser un lien YouTube/Vimeo ci-dessous.",
+                  "MP4, WebM — max 18 MB (recommended: 15-30s). You can also use a YouTube/Vimeo link below.",
+                  "MP4, WebM — 18 MB كحد أقصى (المفضل: 15 إلى 30 ثانية). يمكنك أيضاً وضع رابط YouTube / Vimeo مجاني.",
+                )}
               </p>
             </div>
 
@@ -1238,6 +1268,15 @@ function RugEditorModal({
                   className="field"
                   placeholder="https://…/video.mp4 ou /uploads/…"
                 />
+                {form.videoUrl && /\.(jpe?g|png|webp|avif|gif)(\?.*)?$/i.test(form.videoUrl.trim()) ? (
+                  <p className="mt-1 text-[0.7rem] font-medium text-amber-700">
+                    ⚠️ {t(
+                      "Attention : ce lien semble pointer vers une image, pas une vidéo.",
+                      "Warning: this URL seems to be an image, not a video.",
+                      "تنبيه: هذا الرابط يبدو كرابط صورة وليس فيديو.",
+                    )}
+                  </p>
+                ) : null}
               </label>
               <label className="block">
                 <span className="field-label">Certificat (optionnel)</span>
