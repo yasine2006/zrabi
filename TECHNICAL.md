@@ -190,12 +190,12 @@ Voir `.env.example`. Points clés :
    - `ORDER_ACCESS_SECRET`, `ADMIN_SESSION_SECRET`, `AUTH_SECRET`
    - `TWO_FACTOR_ENCRYPTION_KEY`
    - `SEED_ADMIN_*`
-   - `BLOB_READ_WRITE_TOKEN` (Vercel Blob, pour les uploads d'images)
+   - `BLOB_READ_WRITE_TOKEN` (Vercel Blob, uploads photos/vidéos — store **privé**)
    - `SMTP_*` (optionnel)
-5. Déployer. Les uploads d'images utilisent Vercel Blob si le token est présent.
+5. Déployer. Avec le token, l'admin envoie les fichiers **directement du navigateur vers Vercel Blob** (`@vercel/blob/client`, `access: "private"`) : aucune limite de 4.5 MB sur le body de la fonction. Les fichiers sont servis par `/api/media/[...path]` (token serveur + Range/206 pour la vidéo). Sans token (développement local), les fichiers restent dans `public/uploads` et sont servis par `/api/uploads/[...path]`.
 
 ### Notes
-- Le filesystem Vercel est read-only → `public/uploads` ne persiste pas. Utiliser Vercel Blob (token requis).
+- Le filesystem Vercel est read-only → `public/uploads` ne persiste pas. Le store Blob étant privé, ne jamais utiliser l'URL Blob brute : passer par `/api/media/...` avec `access: "private"` côté serveur.
 - `SECURE_COOKIES` doit être `true` en production HTTPS.
 - Rate limiting est en mémoire (par instance) → remplacer par Redis/Upstash si multi-instance.
 

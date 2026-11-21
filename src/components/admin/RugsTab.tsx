@@ -24,7 +24,9 @@ import type {
 import type { RugStatus, RugType } from "@prisma/client";
 import type { SerializedRug } from "@/lib/api/serializers";
 import { cn } from "@/lib/utils";
+import { upload as uploadToBlob } from "@vercel/blob/client";
 import { compressImage } from "@/lib/image-compress";
+import { createMediaPathname, mediaPublicUrl } from "@/lib/blob-media";
 import {
   AdminCard,
   apiRequest,
@@ -491,6 +493,63 @@ function stateFromRug(rug: SerializedRug): EditorState {
   };
 }
 
+/**
+ * Uploads one catalog file and returns a URL that works in both local dev and
+ * production. On Vercel the browser talks directly to the private Blob store
+ * (client upload) — this avoids the 4.5 MB serverless request body limit, so
+ * 15-30s showcase videos upload reliably from any PC or phone.
+ */
+async function uploadCatalogFile(original: File): Promise<string> {
+  const file = original.type.startsWith("image/")
+    ? await compressImage(original, 1920, 0.82)
+    : original;
+
+  let mode: "blob" | "local" = "local";
+  try {
+    const modeResponse = await fetch("/api/admin/upload", {
+      credentials: "include",
+      cache: "no-store",
+    });
+    if (modeResponse.ok) {
+      const info = (await modeResponse.json()) as { mode?: string };
+      if (info.mode === "blob") mode = "blob";
+    }
+  } catch {
+    // Keep the local fallback if the mode check fails.
+  }
+
+  if (mode === "blob") {
+    const pathname = createMediaPathname(file);
+    if (!pathname) throw new Error("Unsupported file type.");
+
+    const blob = await uploadToBlob(pathname, file, {
+      access: "private",
+      handleUploadUrl: "/api/admin/upload",
+      ...(file.type ? { contentType: file.type } : {}),
+    });
+
+    return mediaPublicUrl(blob.pathname);
+  }
+
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await fetch("/api/admin/upload", {
+    method: "POST",
+    body: formData,
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const data = (await response.json().catch(() => ({}))) as {
+      error?: { message?: string };
+    };
+    throw new Error(data?.error?.message ?? "Upload failed");
+  }
+
+  const data = (await response.json()) as { url: string };
+  return data.url;
+}
+
 function RugEditorModal({
   open,
   rug,
@@ -509,6 +568,7 @@ function RugEditorModal({
   const { t } = useStore();
   const [form, setForm] = useState<EditorState>(() => emptyState(artisans));
   const [busy, setBusy] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [urlInput, setUrlInput] = useState("");
   const [tab, setTab] = useState<"general" | "arabic" | "media">("general");
@@ -517,6 +577,7 @@ function RugEditorModal({
     if (!open) return;
     setError(null);
     setBusy(false);
+    setUploading(false);
     setUrlInput("");
     setTab("general");
     setForm(rug ? stateFromRug(rug) : emptyState(artisans));
@@ -550,35 +611,28 @@ function RugEditorModal({
       return;
     }
 
-    const filesToUpload = Array.from(files).slice(0, remainingSlots);
-    for (const file of filesToUpload) {
-      try {
-        // Automatically optimize & compress photo to sharp WebP (< 350 KB)
-        const optimizedFile = await compressImage(file, 1920, 0.82);
-        const formData = new FormData();
-        formData.append("file", optimizedFile);
-        const res = await fetch("/api/admin/upload", {
-          method: "POST",
-          body: formData,
-          credentials: "include",
-        });
-        if (!res.ok) {
-          const data = await res.json().catch(() => ({}));
-          throw new Error(data?.error?.message ?? "Upload failed");
+    setUploading(true);
+    try {
+      const filesToUpload = Array.from(files).slice(0, remainingSlots);
+      for (const file of filesToUpload) {
+        try {
+          // Compression + private Blob upload (or local disk in dev).
+          const url = await uploadCatalogFile(file);
+          setForm((curr) => {
+            if (curr.photos.length >= 10) return curr;
+            const next = [...curr.photos, url];
+            return { ...curr, photos: next, photosText: next.join("\n") };
+          });
+        } catch (cause) {
+          setError(
+            cause instanceof Error ? cause.message : t("Échec de l'envoi.", "Upload failed.", "فشل الرفع."),
+          );
         }
-        const data = (await res.json()) as { url: string };
-        setForm((curr) => {
-          if (curr.photos.length >= 10) return curr;
-          const next = [...curr.photos, data.url];
-          return { ...curr, photos: next, photosText: next.join("\n") };
-        });
-      } catch (cause) {
-        setError(
-          cause instanceof Error ? cause.message : t("Échec de l'envoi.", "Upload failed.", "فشل الرفع."),
-        );
       }
+    } finally {
+      setUploading(false);
+      event.target.value = "";
     }
-    event.target.value = "";
   }
 
   async function handleVideoUpload(event: React.ChangeEvent<HTMLInputElement>) {
@@ -598,25 +652,16 @@ function RugEditorModal({
       return;
     }
 
+    setUploading(true);
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const res = await fetch("/api/admin/upload", {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data?.error?.message ?? "Upload failed");
-      }
-      const data = (await res.json()) as { url: string };
-      setForm((curr) => ({ ...curr, videoUrl: data.url }));
+      const url = await uploadCatalogFile(file);
+      setForm((curr) => ({ ...curr, videoUrl: url }));
     } catch (cause) {
       setError(
         cause instanceof Error ? cause.message : t("Échec de l'envoi.", "Upload failed.", "فشل الرفع."),
       );
     } finally {
+      setUploading(false);
       event.target.value = "";
     }
   }
@@ -1132,11 +1177,21 @@ function RugEditorModal({
               </div>
               <br />
               <label className="btn-secondary mt-3 inline-flex cursor-pointer items-center gap-2 px-4 py-2 text-xs">
-                <span>Choisir des fichiers</span>
+                {uploading ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Upload className="h-3.5 w-3.5" />
+                )}
+                <span>
+                  {uploading
+                    ? t("Envoi en cours…", "Uploading…", "جارٍ الرفع…")
+                    : t("Choisir des fichiers", "Choose files", "اختر الملفات")}
+                </span>
                 <input
                   type="file"
                   multiple
                   accept="image/*"
+                  disabled={uploading}
                   onChange={handleFileUpload}
                   className="hidden"
                 />
@@ -1162,10 +1217,20 @@ function RugEditorModal({
                 </div>
               ) : (
                 <label className="btn-secondary mt-3 inline-flex cursor-pointer items-center gap-2 px-4 py-2 text-xs">
-                  <span>{t("Importer une vidéo", "Import a video", "استيراد فيديو")}</span>
+                  {uploading ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Upload className="h-3.5 w-3.5" />
+                  )}
+                  <span>
+                    {uploading
+                      ? t("Envoi en cours…", "Uploading…", "جارٍ الرفع…")
+                      : t("Importer une vidéo", "Import a video", "استيراد فيديو")}
+                  </span>
                   <input
                     type="file"
                     accept="video/*"
+                    disabled={uploading}
                     onChange={handleVideoUpload}
                     className="hidden"
                   />
@@ -1266,7 +1331,7 @@ function RugEditorModal({
                   value={form.videoUrl}
                   onChange={(event) => set("videoUrl", event.target.value)}
                   className="field"
-                  placeholder="https://…/video.mp4 ou /uploads/…"
+                  placeholder="https://…/video.mp4 ou /api/media/catalog/…"
                 />
                 {form.videoUrl && /\.(jpe?g|png|webp|avif|gif)(\?.*)?$/i.test(form.videoUrl.trim()) ? (
                   <p className="mt-1 text-[0.7rem] font-medium text-amber-700">
